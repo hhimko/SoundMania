@@ -10,7 +10,7 @@ class SerialDevice:
     Basic wrapper for `pyserial.Serial` objects.
     """
     def __init__(self, device_name: str = "Arduino"):
-        self.port = Serial(baudrate=9600, timeout=None)
+        self.port = Serial(baudrate=115200, timeout=None)
         self.device_name = device_name
 
 
@@ -27,6 +27,8 @@ class SerialDevice:
         """
         Closes the serial connection.
         """
+        if not self.connected: return
+        
         self.port.close()
         logger.info(f"Device `{self.device_name}` was successfully disconnected")
         
