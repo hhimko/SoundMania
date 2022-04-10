@@ -7,7 +7,7 @@ logger = logging.getLogger("SerialDevice")
 
 class SerialDevice:
     """
-    Basic wrapper for `pyserial.Serial` objects.
+    Simplified wrapper for `pyserial.Serial` objects.
     """
     def __init__(self, device_name: str = "Arduino"):
         self.port = Serial(baudrate=115200, timeout=None)
@@ -17,25 +17,49 @@ class SerialDevice:
     @property
     def connected(self) -> bool:
         """
+        Check whether the port is active.
+        
         Returns:
             True if the device's port was successfully located and is currently opened, otherwise False
         """
-        return self.port.is_open
+        if not self.port.is_open:
+            return False
+        
+        try:
+            self.port.in_waiting # try pinging the device to see if the port connection is still open 
+        except SerialException:
+            logger.info(f"Connection to device `{self.device_name}` was unexpectedly lost")
+            self.port.close()
+            return False
+        else:
+            return True
+    
+    
+    def read(self) -> list[int]:
+        """
+        Retrieve recieved bytes from the serial port buffer.
+        
+        Returns:
+            list of recieved bytes converted to integer values
+        """
+        recv = self.port.read_all()
+        return list(recv) if recv else []
     
     
     def disconnect(self):
         """
-        Closes the serial connection.
+        Close the serial connection.
         """
-        if not self.connected: return
+        if not self.connected: 
+            return
         
         self.port.close()
         logger.info(f"Device `{self.device_name}` was successfully disconnected")
         
     
-    def _try_connect(self) -> bool:
+    def connect(self) -> bool:
         """
-        Makes a single attempt of connecting to a port with a desired name given by `self.device_name`.
+        Make a single attempt of connecting to a port with a desired name given by `self.device_name`.
         
         Returns:
             True if a connection was established, otherwise False
