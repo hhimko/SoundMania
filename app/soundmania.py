@@ -29,6 +29,7 @@ class SoundMania:
     def render(self):
         pass
     
+    
     def run(self):
         pygame.init()
         

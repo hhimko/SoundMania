@@ -1,9 +1,9 @@
 /* IO PINS */
-#define BUTTON_COUNT 2
-byte BUTTON_PINS[BUTTON_COUNT] = {10, 11}; // BUTTON_PINS[0] should be defined as the leftmost button on the controller
+#define BUTTON_COUNT 4
+byte BUTTON_PINS[BUTTON_COUNT] = {10, 11, 12, 13}; // BUTTON_PINS[0] should be defined as the leftmost button on the controller
 
 /* CONTROLLER STATES */
-byte buttonState = 0b00; // each bit corresponds to a single button state
+byte buttonState = 0b0000; // each bit corresponds to a single button state
 byte knobState   = 0b0;
 
 
@@ -32,7 +32,7 @@ bool readButtonState(byte& state){
   byte previous_state = state;
 
   for (int i=BUTTON_COUNT-1; i >= 0; --i){
-    bool pin = !digitalRead(BUTTON_PINS[i]);
+    bool pin = !digitalRead(BUTTON_PINS[i]); // boolean value is negated here because of the INPUT_PULLUP mode
 
     if (pin ^ ((state >> i) & 0b1)){
       byte new_state = (state & ~(0b1 << i)) | (pin << i); // set the appropriate bit
