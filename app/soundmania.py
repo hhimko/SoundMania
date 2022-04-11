@@ -12,7 +12,6 @@ from arduino_controller import ArduinoController
 class SoundMania:
     def __init__(self):
         self.controller = ArduinoController()
-        self.running = False
         
         self.clock = pygame.time.Clock()
         
@@ -30,16 +29,15 @@ class SoundMania:
     def render(self):
         pass
     
-    
     def run(self):
         pygame.init()
         
-        self.running = True
+        self._running = True
         self.mainloop()
     
     
     def mainloop(self):
-        while self.running:
+        while self._running:
             self.handle_input()
             self.update()
             self.render()

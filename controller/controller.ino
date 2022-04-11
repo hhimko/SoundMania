@@ -1,17 +1,16 @@
 /* IO PINS */
-#define BTN1 10
-#define BTN2 11
+#define BUTTON_COUNT 2
+byte BUTTON_PINS[BUTTON_COUNT] = {10, 11}; // BUTTON_PINS[0] should be defined as the leftmost button on the controller
 
 /* CONTROLLER STATES */
-bool BTN1Down = false;
-bool BTN2Down = false;
+byte buttonState = 0b00; // each bit corresponds to a single button state
+byte knobState   = 0b0;
 
 
 void setup() {
-  pinMode(LED_BUILTIN, OUTPUT);
-  
-  pinMode(BTN1, INPUT_PULLUP);
-  pinMode(BTN2, INPUT_PULLUP);
+
+  for (auto bp : BUTTON_PINS)
+    pinMode(bp, INPUT_PULLUP);
 
   // initialize serial communication at 9600 bits per second
   Serial.begin(115200);
@@ -23,16 +22,36 @@ void setup() {
 }
 
 void loop() {
-  if (!digitalRead(BTN1) ^ BTN1Down) {
-    Serial.write((byte)0);
-    BTN1Down = !BTN1Down;
+  
+  if (readButtonState(buttonState))
+    sendButtonPacket(buttonState); // send packet only if the state has chaged
+
+}
+
+bool readButtonState(byte& state){
+  byte previous_state = state;
+
+  for (int i=BUTTON_COUNT-1; i >= 0; --i){
+    bool pin = !digitalRead(BUTTON_PINS[i]);
+
+    if (pin ^ ((state >> i) & 0b1)){
+      byte new_state = (state & ~(0b1 << i)) | (pin << i); // set the appropriate bit
+      state = new_state;
+    }
+    
   }
 
-  if (!digitalRead(BTN2) ^ BTN2Down) {
-    Serial.write((byte)1);
-    BTN2Down = !BTN2Down;
-  }
+  return state ^ previous_state; // this will return 0 only when the states are equal
 }
+
+void sendButtonPacket(byte state){
+  Serial.write(0b00000000 + state);
+}
+
+void sendKnobPacket(byte state){
+  Serial.write(0b10000000 + state);
+}
+
 
 // serialEvent() is automatically run at the end of loop()
 void serialEvent() {

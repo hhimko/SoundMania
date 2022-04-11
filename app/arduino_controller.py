@@ -12,6 +12,7 @@ class ArduinoController:
         
         self._knobs = (0,0)
         self.btn1_down = False
+        self.btn2_down = False
         self.state = []
         
         self._timeout = 0
@@ -32,7 +33,11 @@ class ArduinoController:
             self._try_connect(dt)
             return
         
-        # print(self._dev.read())
+        for x in self._dev.read():
+            self.btn1_down = bool(x & 0b00000001)
+            self.btn2_down = bool(x & 0b00000010)
+            
+        print(self.btn1_down, self.btn2_down)
         
         
     def poll_event(self) -> list[int]:
