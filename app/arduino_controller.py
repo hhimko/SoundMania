@@ -61,6 +61,15 @@ class ArduinoController:
     
     
     def update(self, dt: int):
+        """ Update the controller state by reading the devices' serial port buffer.
+        
+            This method is additionally responsible for maintaining the connection
+            with the controller. It periodically attempts to open the connection and
+            pings the serial port to check its current state. 
+            
+            Args:
+                dt: elapsed time since the last frame. 
+        """
         if not self._dev.connected:
             self._try_connect(dt)
             return
@@ -71,7 +80,7 @@ class ArduinoController:
             print(list(map(int, self._buttons)))
         
         
-    def poll_event(self) -> list[int]:
+    def poll_event(self) -> list[int]: # TODO: add event system to ArduinoController
         return self.state
     
     
