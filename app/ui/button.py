@@ -1,10 +1,10 @@
 from typing import Callable
 
 import pygame
-from pygame.sprite import Sprite
-from pygame.surface import Surface
 from pygame.font import Font
 from pygame.rect import Rect
+
+from ui import UIComponent
 
 
 class _CallbackProperty(property):
@@ -19,48 +19,51 @@ class _CallbackProperty(property):
     """
     def __init__(self):
         """ Make a new descriptor property for callable types. """
-        super().__init__(self.getter, self.setter, self.deleter)
-        self.callback = self.NO_OP
-        
-        
+        super().__init__(self._getter, self._setter, self._deleter)
+
+
     @staticmethod    
     def NO_OP(*args, **kwargs) -> None:
         pass
     
+    
+    def __set_name__(self, obj: type, name: str) -> None:
+        self.callback_accessor = f"_{name}"
+        setattr(obj, self.callback_accessor, self.NO_OP)
 
-    def getter(self, obj: type) -> Callable:
-        return self.callback
+
+    def _getter(self, obj: type) -> Callable:
+        return getattr(obj, self.callback_accessor)
     
     
-    def setter(self, obj: type, value: Callable | None) -> None:
+    def _setter(self, obj: type, value: Callable | None) -> None:
         if value is None:
-            self.deleter(obj)
+            self._deleter(obj)
         else:
             assert callable(value), "callback property value must be a callable"
-            self.callback = value
+            setattr(obj, self.callback_accessor, value)
             
         
-    def deleter(self, obj: type) -> None:
-        self.callback = self.NO_OP
+    def _deleter(self, obj: type) -> None:
+        setattr(obj, self.callback_accessor, self.NO_OP)
 
 
 
 
-class Button(Sprite):
+class Button(UIComponent):
     on_mouse_pressed = _CallbackProperty()
     on_mouse_over    = _CallbackProperty()
     on_mouse_down    = _CallbackProperty()
     on_mouse_up      = _CallbackProperty()
 
-    def __init__(self, x: int, y: int, w: int, h: int):
-        super().__init__()
-        self.rect = Rect()
+    def __init__(self, x: int, y: int, w: int, h: int, **kwargs):
+        super().__init__(**kwargs)
+        self.rect = Rect(x, y, w, h)
 
         self.is_mouse_pressed = False
         self.is_mouse_over    = False
 
         self._surface = Font(None, h).render("test text", True, (0,0,0))
-        self.rect.topleft = (x, y)
 
 
     @property
@@ -69,7 +72,7 @@ class Button(Sprite):
 
 
     @text.setter
-    def text(self, value: str):
+    def text(self, value: str) -> None:
         self._text = value
 
 
@@ -96,5 +99,5 @@ class Button(Sprite):
             self.is_mouse_pressed = False 
 
 
-    def render(self, surface: Surface) -> None:
-        surface.blit(self._surface, (self.x, self.y))
+    def render(self, surface: pygame.surface.Surface) -> None:
+        surface.blit(self._surface, (self.rect.x, self.rect.y))
