@@ -1,3 +1,4 @@
+from functools import partial
 from typing import Callable
 
 import pygame
@@ -16,6 +17,9 @@ class _CallbackProperty(property):
         A CallbackProperty instance can be set to either a callable method or
         `None`, which works the same way as deleting the propetry with the `del`
         keyword and resets the callback to NO_OP.
+
+        When setting a CallbackProperty to a callable, it's automatically injected
+        with a `self`-like argument.
     """
     def __init__(self):
         """ Make a new descriptor property for callable types. """
@@ -41,7 +45,9 @@ class _CallbackProperty(property):
             self._deleter(obj)
         else:
             assert callable(value), "callback property value must be a callable"
-            setattr(obj, self.callback_accessor, value)
+
+            injected = partial(value, obj)
+            setattr(obj, self.callback_accessor, injected)
             
         
     def _deleter(self, obj: type) -> None:
@@ -81,19 +87,19 @@ class Button(UIComponent):
         lmb_down = pygame.mouse.get_pressed()[0]
 
         if self.rect.collidepoint(mouse_pos):
-            self.on_mouse_over(self)
+            self.on_mouse_over()
             self.is_mouse_over = True
 
             if lmb_down:
                 if not self.is_mouse_pressed:
-                    self.on_mouse_down(self)
+                    self.on_mouse_down()
 
-                self.on_mouse_pressed(self)
+                self.on_mouse_pressed()
                 self.is_mouse_pressed = True
 
             elif self.is_mouse_pressed:
                    self.is_mouse_pressed = False 
-                   self.on_mouse_up(self)
+                   self.on_mouse_up()
         else:
             self.is_mouse_over = False
             self.is_mouse_pressed = False 
