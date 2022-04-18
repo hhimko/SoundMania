@@ -5,7 +5,7 @@ import pygame
 from pygame.font import Font
 from pygame.rect import Rect
 
-from ui import UIComponent
+from ui.core import UIComponent
 
 
 class _CallbackProperty(property):
@@ -23,7 +23,7 @@ class _CallbackProperty(property):
     """
     def __init__(self):
         """ Make a new descriptor property for callable types. """
-        super().__init__(self._getter, self._setter, self._deleter)
+        super().__init__(self.getter, self.setter, self.deleter)
 
 
     @staticmethod    
@@ -36,21 +36,22 @@ class _CallbackProperty(property):
         setattr(obj, self.callback_accessor, self.NO_OP)
 
 
-    def _getter(self, obj: type) -> Callable:
+    def getter(self, obj: type) -> Callable: # type: ignore
         return getattr(obj, self.callback_accessor)
     
     
-    def _setter(self, obj: type, value: Callable | None) -> None:
+    def setter(self, obj: type, value: Callable | None) -> None: # type: ignore
         if value is None:
-            self._deleter(obj)
-        else:
-            assert callable(value), "callback property value must be a callable"
+            return self.deleter(obj)
+        
+        if not callable(value):
+            raise ValueError(f"callback property value must be a callable, not {type(value)}")
 
-            injected = partial(value, obj)
-            setattr(obj, self.callback_accessor, injected)
+        injected = partial(value, obj)
+        setattr(obj, self.callback_accessor, injected)
             
         
-    def _deleter(self, obj: type) -> None:
+    def deleter(self, obj: type) -> None: # type: ignore
         setattr(obj, self.callback_accessor, self.NO_OP)
 
 

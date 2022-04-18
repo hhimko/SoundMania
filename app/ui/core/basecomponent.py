@@ -5,11 +5,42 @@ from abc import ABC, abstractmethod
 
 class UIComponent(ABC):
     """ Abstract class defining a renderable UI element. """
-    def __init__(self, **kwargs):
+    def __init__(self, name: str, rect: pygame.rect.Rect, **kwargs):
+        self._name = name
+        self.x = rect.x
+        self.y = rect.y
+
+        self.surface = pygame.surface.Surface((rect.w, rect.h))
+
         self.config(**kwargs)
 
 
-    def config(self, **kwargs):
+    @property
+    def name(self) -> str:
+        return self._name
+
+
+    @property
+    def width(self) -> int:
+        return self.surface.get_width()
+
+
+    @width.setter
+    def width(self, value: int) -> None:
+        self.surface = pygame.surface.Surface((value, self.height))
+
+
+    @property
+    def height(self) -> int:
+        return self.surface.get_height()
+
+
+    @height.setter
+    def height(self, value: int) -> None:
+        self.surface = pygame.surface.Surface((self.width, value))
+
+
+    def config(self, **kwargs) -> None:
         """ Set all overwritable attributes passed as keyword arguments. """
         for k, v in kwargs.items():
             attr = getattr(type(self), k)
