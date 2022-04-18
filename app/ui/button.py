@@ -26,7 +26,7 @@ class _CallbackProperty(property):
         super().__init__(self.getter, self.setter, self.deleter)
 
 
-    @staticmethod    
+    @staticmethod
     def NO_OP(*args, **kwargs) -> None:
         pass
     
@@ -63,31 +63,17 @@ class Button(UIComponent):
     on_mouse_down    = _CallbackProperty()
     on_mouse_up      = _CallbackProperty()
 
-    def __init__(self, x: int, y: int, w: int, h: int, **kwargs):
-        super().__init__(**kwargs)
-        self.rect = Rect(x, y, w, h)
-
+    def __init__(self, name: str, rect: pygame.rect.Rect, **kwargs):
+        super().__init__(name, rect, **kwargs)
         self.is_mouse_pressed = False
         self.is_mouse_over    = False
-
-        self._surface = Font(None, h).render("test text", True, (0,0,0))
-
-
-    @property
-    def text(self) -> str:
-        return self._text
-
-
-    @text.setter
-    def text(self, value: str) -> None:
-        self._text = value
 
 
     def update(self, dt: int) -> None:
         mouse_pos = pygame.mouse.get_pos()
         lmb_down = pygame.mouse.get_pressed()[0]
 
-        if self.rect.collidepoint(mouse_pos):
+        if self.get_rect().collidepoint(mouse_pos):
             self.on_mouse_over()
             self.is_mouse_over = True
 
@@ -107,4 +93,4 @@ class Button(UIComponent):
 
 
     def render(self, surface: pygame.surface.Surface) -> None:
-        surface.blit(self._surface, (self.rect.x, self.rect.y))
+        surface.blit(self.surface, (self.x, self.y))
