@@ -2,20 +2,19 @@ from typing import Iterator, Optional
 
 import pygame
 
+from ui.core.type import _TupleI4
 from ui.core.basecomponent import UIComponent
 
 
 _ElementNameMissing = object()
-_ElementIterable = Optional[list[UIComponent] | tuple[UIComponent]]
 
 class UIContainer(UIComponent):
-    def __init__(self, name: str, rect: pygame.rect.Rect, elements: _ElementIterable=None, **kwargs):
+    def __init__(self, name: str, rect: _TupleI4 | pygame.Rect, *elements: UIComponent, **kwargs):
         super().__init__(name, rect, **kwargs)
         self.elements: dict[str, UIComponent] = {}
         
-        if elements:
-            for element in elements:
-                self.add(element)
+        for element in elements:
+            self.add(element)
 
             
     def add(self, element: UIComponent) -> None:

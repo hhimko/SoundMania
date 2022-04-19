@@ -9,13 +9,13 @@ class MainMenuView(View):
         super().__init__(root)
 
         # view layout
-        self.menu_items = MenuItemList("menu_container", pygame.rect.Rect(0,0,500,500),
-            Button("button_play", pygame.rect.Rect(100,100,100,50), text="PLAY", color=(255,255,255)),
-            Button("button_quit", pygame.rect.Rect(100,200,100,50), text="QUIT", color=(255,255,255)),
+        self.menu_items = MenuItemList("menu_container", (0,0,500,500),
+            Button("button_play", (100,100,100,50), text="PLAY", color=(255,255,255)),
+            Button("button_quit", (100,200,100,50), text="QUIT", color=(255,255,255)),
         )
 
-        self.menu_items.button_play.on_mouse_up = lambda obj: print("play")
-        self.menu_items.button_quit.on_mouse_up = lambda obj: print("quit")
+        self.menu_items.button_play.on_mouse_over = lambda obj: print("play")
+        self.menu_items.button_quit.on_mouse_over = lambda obj: print("quit")
     
 
     def handle_input(self, event_list: list[pygame.event.Event]) -> None:

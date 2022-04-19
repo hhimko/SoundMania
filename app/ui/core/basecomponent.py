@@ -2,22 +2,29 @@ import pygame
 
 from abc import ABC, abstractmethod
 
+from ui.core.type import _TupleI4, _ColorRGB, _ColorRGBA
 
-_ColorRGB = tuple[int, int, int, int]
-_ColorRGBA = tuple[int, int, int]
+
+def _read_size_from_rect(rect: _TupleI4 | pygame.Rect) -> _TupleI4:
+        r = pygame.Rect(rect)
+        return r.x, r.y, r.w, r.h
+
 
 class UIComponent(ABC):
     """ Abstract class defining a renderable UI element. """
-    def __init__(self, name: str, rect: pygame.rect.Rect, **kwargs):
+    def __init__(self, name: str, rect: _TupleI4 | pygame.Rect, **kwargs):
         self._name = name
-        self.surface = pygame.surface.Surface((rect.w, rect.h))
-        self.x = rect.x
-        self.y = rect.y
+
+        x, y, w, h = _read_size_from_rect(rect)
+        self.surface = pygame.surface.Surface((w, h))
+        self.x = x
+        self.y = y
 
         # TODO: extract optional component modules 
         self._color: _ColorRGB | _ColorRGBA = (0,0,0,0)
+
         self._text = ''
-        self._text_size = rect.h
+        self._text_size = h
         self._text_color: _ColorRGB | _ColorRGBA = (0,0,0)
 
         self.config(**kwargs)
@@ -127,9 +134,9 @@ class UIComponent(ABC):
         pass
 
 
-    def get_rect(self) -> pygame.rect.Rect:
+    def get_rect(self) -> pygame.Rect:
         """ Return a new pygame `Rect` object of this components' size. """
-        return pygame.rect.Rect(self.x, self.y, self.width, self.height)
+        return pygame.Rect(self.x, self.y, self.width, self.height)
 
 
     def _render_text(self) -> None:
