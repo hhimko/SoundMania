@@ -1,4 +1,4 @@
-from typing import Iterator, Optional
+from typing import Generic, TypeVar
 
 import pygame
 
@@ -6,18 +6,18 @@ from ui.core.type import _TupleI4
 from ui.core.basecomponent import UIComponent
 
 
-_ElementNameMissing = object()
+T = TypeVar('T', bound=UIComponent)
 
-class UIContainer(UIComponent):
-    def __init__(self, name: str, rect: _TupleI4 | pygame.Rect, *elements: UIComponent, **kwargs):
+class UIContainer(UIComponent, Generic[T]):
+    def __init__(self, name: str, rect: _TupleI4 | pygame.Rect, *elements: T, **kwargs):
         super().__init__(name, rect, **kwargs)
-        self.elements: dict[str, UIComponent] = {}
+        self.elements: dict[str, T] = {}
         
         for element in elements:
             self.add(element)
 
             
-    def add(self, element: UIComponent) -> None:
+    def add(self, element: T) -> None:
         """ Add new component to the container. 
         
             Args:
@@ -38,7 +38,7 @@ class UIContainer(UIComponent):
             Args:
                 dt: elapsed time since the last frame
         """
-        for element in self:
+        for element in self.elements.values():
             element.update(dt)
 
 
@@ -51,19 +51,16 @@ class UIContainer(UIComponent):
         """
         self.surface.fill(self.color)
 
-        for element in self:
+        for element in self.elements.values():
             element.render(self.surface)
 
         surface.blit(self.surface, (self.x, self.y))
             
         
-    def __getattr__(self, attr: str):
+    def __getattr__(self, attr: str) -> T:
         # TODO: depthen lookup by iterating through containers
-        element = self.elements.get(attr, _ElementNameMissing) 
-        if element is _ElementNameMissing:
+        element = self.elements.get(attr) 
+        if element is None:
             raise AttributeError(f"container '{self.name} does not contain element with name '{attr}''")
+        
         return element
-
-
-    def __iter__(self) -> Iterator[UIComponent]:
-        return iter(self.elements.values())

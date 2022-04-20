@@ -14,7 +14,7 @@ class MainMenuView(View):
             Button("button_quit", (100,200,100,50), text="QUIT", color=(255,255,255)),
         )
 
-        self.menu_items.button_play.on_mouse_over = lambda obj: print("play")
+        self.menu_items.button_play.config(on_mouse_over = lambda obj: print("play"))
         self.menu_items.button_quit.on_mouse_over = lambda obj: print("quit")
     
 
