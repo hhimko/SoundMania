@@ -8,7 +8,7 @@ import pygame
 pygame.init()
 
 from arduino_controller import ArduinoController
-from view.mainmenu import MainMenuView
+from view import MainMenuView
 
 
 class SoundMania:

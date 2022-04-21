@@ -30,11 +30,11 @@ class callbackproperty(property):
         setattr(obj, self.callback_accessor, self.NO_OP)
 
 
-    def getter(self, obj: type) -> Callable: # type: ignore
+    def getter(self, obj: type) -> Callable:
         return getattr(obj, self.callback_accessor)
     
     
-    def setter(self, obj: type, value: Callable | None) -> None: # type: ignore
+    def setter(self, obj: type, value: Callable | None) -> None:
         if value is None:
             return self.deleter(obj)
         
@@ -45,5 +45,5 @@ class callbackproperty(property):
         setattr(obj, self.callback_accessor, injected)
             
         
-    def deleter(self, obj: type) -> None: # type: ignore
+    def deleter(self, obj: type) -> None:
         setattr(obj, self.callback_accessor, self.NO_OP)
