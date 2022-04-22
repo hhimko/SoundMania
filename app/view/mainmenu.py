@@ -1,5 +1,6 @@
 import pygame
 
+from ui.core.units import vw, vh
 from view.baseview import View
 from ui import Button, MenuItemList
 
@@ -9,10 +10,10 @@ class MainMenuView(View):
         super().__init__(root)
 
         # view layout
-        self.menu_items = MenuItemList("menu_container", (0,0,200,200),
-            Button("button_play", (0,-50,100,50), centered=True, text="PLAY", color=(255,255,255)),
-            Button("button_quit", (0, 50,100,50), centered=True, text="QUIT", color=(255,255,255)),
-            centered=True
+        self.menu_items = MenuItemList("menu_container", (0,0,vw(70),vh(50)),
+            Button("button_play", (0,vh(-10),vw(50),vh(10)), centered=True, text="PLAY", color=(255,255,255)),
+            Button("button_quit", (0,vh( 10),vw(50),vh(10)), centered=True, text="QUIT", color=(255,255,255)),
+            centered = True
         )
 
         self.menu_items.button_play.on_mouse_click = lambda obj: print("PLAY")
@@ -45,4 +46,4 @@ class MainMenuView(View):
         
         
     def on_window_resize(self) -> None:
-        self.menu_items._winpos_recompute()
+        self.menu_items._on_window_resize()

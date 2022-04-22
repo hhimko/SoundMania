@@ -1,6 +1,6 @@
 import pygame
 
-from ui.core.type import _TupleI4
+from ui.core.type import _UnitRect
 from ui.core import UIComponent, callbackproperty
 
 
@@ -11,7 +11,7 @@ class Button(UIComponent):
     on_mouse_down    = callbackproperty()
     on_mouse_up      = callbackproperty()
 
-    def __init__(self, name: str, rect: _TupleI4 | pygame.Rect, **kwargs):
+    def __init__(self, name: str, rect: _UnitRect | pygame.Rect, **kwargs):
         super().__init__(name, rect, **kwargs)
         
         self.is_mouse_pressed = False

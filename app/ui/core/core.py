@@ -1,5 +1,6 @@
+from abc import ABC, abstractmethod
 from functools import partial
-from typing import Callable
+from typing import Any, Callable
 
 
 class callbackproperty(property):
@@ -48,3 +49,18 @@ class callbackproperty(property):
     def deleter(self, obj: type) -> None:
         setattr(obj, self.callback_accessor, self.NO_OP)
         
+        
+        
+
+class EvalAttrProxy(ABC):
+    def __init__(self, value: float):
+        self.value = self.preprocess(value)
+    
+    
+    def preprocess(self, value: float) -> float:
+        return value
+    
+    
+    @abstractmethod
+    def evaluate(self, obj) -> Any:
+        pass

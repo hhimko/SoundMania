@@ -1,34 +1,34 @@
 from __future__ import annotations
 from functools import cached_property
-from turtle import position
+from typing import Any
 
 import pygame
 
-from ui.core.type import _TupleI4, _ColorRGB, _ColorRGBA
+from ui.core.type import _ColorRGB, _ColorRGBA, _Unit, _UnitRect
+from ui.core.core import EvalAttrProxy
 
-
-def _read_size_from_rect(rect: _TupleI4 | pygame.Rect) -> _TupleI4:
-        r = pygame.Rect(rect)
-        return r.x, r.y, r.w, r.h
-    
+def _read_size_from_rect(rect: _UnitRect | pygame.Rect) -> _UnitRect:
+    if isinstance(rect, pygame.Rect):
+        return rect.x, rect.y, rect.w, rect.h
+    return rect
+        
     
 class UIComponent:
     """ Abstract class defining a renderable UI element. """
-    def __init__(self, name: str, rect: _TupleI4 | pygame.Rect, **kwargs):
+    def __init__(self, name: str, rect: _UnitRect | pygame.Rect, **kwargs):
         self.name = name
         self._parent: UIComponent | None = None
         self.is_dirty = True # forces the surface to be redrawn on first render
 
-        x, y, w, h = _read_size_from_rect(rect)
-        self._pos = (x, y)
-        self.surface = pygame.surface.Surface((w, h))
+        self._x, self._y, self._width, self._height = _read_size_from_rect(rect)
+        self.surface = pygame.surface.Surface(self.size)
 
         # TODO: extract optional component modules 
         self._is_centered = False
         self._color: _ColorRGB | _ColorRGBA = (0,0,0)
 
         self._text = ''
-        self._text_size = h
+        self._text_size = self.height
         self._text_color: _ColorRGB | _ColorRGBA = (0,0,0)
 
         self.config(**kwargs)
@@ -49,44 +49,57 @@ class UIComponent:
         
         
     @property
-    def position(self) -> tuple[int, int]:
-        return self._pos
+    def position(self) -> tuple[float, float]:
+        return self.x, self.y
     
     
     @position.setter
-    def position(self, value: tuple[int, int]) -> None:
-        self._pos = value
+    def position(self, value: tuple[_Unit, _Unit]) -> None:
+        self.x, self.y = value
+        
+        
+    @property
+    def x(self) -> float:
+        attr = self._x
+        if isinstance(attr, EvalAttrProxy):
+            return attr.evaluate(self)
+        
+        return attr
+    
+    
+    @x.setter
+    def x(self, value: _Unit) -> None:
+        self._x = value
         self._winpos_recompute()
         
         
     @property
-    def x(self) -> int:
-        return self._pos[0]
-    
-    
-    @x.setter
-    def x(self, value: int) -> None:
-        self.position = (value, self.y) # forces the absolute position to be recomputed
+    def y(self) -> float:
+        attr = self._y
+        if isinstance(attr, EvalAttrProxy):
+            return attr.evaluate(self)
         
-        
-    @property
-    def y(self) -> int:
-        return self._pos[1]
+        return attr
     
     
     @y.setter
-    def y(self, value: int) -> None:
-        self.position = (self.x, value) # forces the absolute position to be recomputed
+    def y(self, value: _Unit) -> None:
+        self._y = value
+        self._winpos_recompute()
         
 
     @property
-    def width(self) -> int:
-        return self.surface.get_width()
+    def width(self) -> float:
+        attr = self._width
+        if isinstance(attr, EvalAttrProxy):
+            return attr.evaluate(self)
+        
+        return attr
 
 
     @width.setter
-    def width(self, value: int) -> None:
-        self.surface = pygame.surface.Surface((value, self.height))
+    def width(self, value: _Unit) -> None:
+        self._width = value
         
         self.is_dirty = True
         if self.centered:
@@ -94,25 +107,31 @@ class UIComponent:
 
 
     @property
-    def height(self) -> int:
-        return self.surface.get_height()
+    def height(self) -> float:
+        attr = self._height
+        if isinstance(attr, EvalAttrProxy):
+            return attr.evaluate(self)
+        
+        return attr
 
 
     @height.setter
-    def height(self, value: int) -> None:
-        self.surface = pygame.surface.Surface((self.width, value))
+    def height(self, value: _Unit) -> None:
+        self._height = value
+        
         self.is_dirty = True
+        if self.centered:
+            self._winpos_recompute()
         
         
     @property
-    def size(self) -> tuple[int, int]:
+    def size(self) -> tuple[float, float]:
         return self.width, self.height
     
     
     @size.setter
-    def size(self, value: tuple[int, int]) -> None:
-        self.surface = pygame.surface.Surface(value)
-        self.is_dirty = True
+    def size(self, value: tuple[_Unit, _Unit]) -> None:
+        self.width, self.height = value
         
 
     @property
@@ -150,7 +169,7 @@ class UIComponent:
     
     @property
     def text_size(self) -> int:
-        return self._text_size
+        return int(self._text_size)
 
     
     @text_size.setter
@@ -210,13 +229,13 @@ class UIComponent:
         
         
     @cached_property
-    def _winpos(self) -> tuple[int, int]:
-        x, y = (self.x, self.y)
+    def _winpos(self) -> tuple[float, float]:
+        x, y = self.position
         
         if self.centered:
             pw, ph = self.parent.size if self.parent else pygame.display.get_window_size()
             sw, sh = self.size
-            x, y = (pw//2 + x - sw//2, ph//2 + y - sh//2)
+            x, y = (pw/2 + x - sw/2, ph/2 + y - sh/2)
         
         return (x + self.parent._winpos[0], y + self.parent._winpos[1]) if self.parent else (x, y)
     
@@ -239,7 +258,18 @@ class UIComponent:
     def _redraw_text(self) -> None:
         overlay = pygame.font.Font(None, self.text_size).render(self.text, True, self.text_color)
         self.surface.blit(overlay, (0,0))
+        
+        
+    def _on_window_resize(self) -> None:
+        self.surface = pygame.surface.Surface(self.size)
+        self.is_dirty = True
+        
+        self._winpos_recompute()
+        
+        
+    def __getattribute__(self, name: str) -> Any:
+        attr =  super().__getattribute__(name)
+        if isinstance(attr, EvalAttrProxy):
+            attr = attr.evaluate(self)
             
-            
-
-            
+        return attr

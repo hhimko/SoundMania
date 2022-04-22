@@ -2,13 +2,13 @@ from typing import Generic, TypeVar
 
 import pygame
 
-from ui.core.type import _TupleI4
+from ui.core.type import _UnitRect
 from ui.core.basecomponent import UIComponent
 
 
 T = TypeVar('T', bound=UIComponent)
 class UIContainer(UIComponent, Generic[T]):
-    def __init__(self, name: str, rect: _TupleI4 | pygame.Rect, *elements: T, **kwargs):
+    def __init__(self, name: str, rect: _UnitRect | pygame.Rect, *elements: T, **kwargs):
         self.elements: dict[str, T] = {} # this has to appear before super().__init__() for config() attr lookup
         super().__init__(name, rect, **kwargs)
         
@@ -60,6 +60,13 @@ class UIContainer(UIComponent, Generic[T]):
         
         for element in self.elements.values():
             element._winpos_recompute()
+            
+            
+    def _on_window_resize(self) -> None:
+        super()._on_window_resize()
+        
+        for element in self.elements.values():
+            element._on_window_resize()
             
         
     def __getattr__(self, attr: str) -> T:
