@@ -211,7 +211,6 @@ class UIComponent:
         
     @cached_property
     def _winpos(self) -> tuple[int, int]:
-        print(f"recomputing winpos for obj {self}")
         x, y = (self.x, self.y)
         
         if self.centered:

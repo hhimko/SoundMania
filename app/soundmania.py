@@ -29,13 +29,11 @@ class SoundMania:
     
     def mainloop(self) -> None:
         while self._running:
-            dt = self.clock.tick(60)
-            view = self.view
-            
-            event_list = pygame.event.get()
-            view.handle_input(event_list)
-            view.update(dt)
-            view.render(self.screen_surface)
+            dt = self.clock.tick()
+
+            self._handle_events()
+            self.view.update(dt)
+            self.view.render(self.screen_surface)
             
             pygame.display.flip()
             pygame.display.set_caption(f"SoundMania | FPS: {round(self.clock.get_fps())}")
@@ -47,8 +45,21 @@ class SoundMania:
         self._running = False
         
         
+    def _handle_events(self) -> None:
+        event_list = []
+        
+        for event in pygame.event.get():
+            if event.type == pygame.VIDEORESIZE:
+                self.view.on_window_resize()
+            else:
+                # events unhandles here are passed for the view event handler
+                event_list.append(event)
+                
+        self.view.handle_input(event_list)
+        
+        
     def _pygame_init(self) -> None:        
-        win_flags = 0 # pygame.RESIZABLE
+        win_flags = pygame.RESIZABLE
         self.screen_surface = pygame.display.set_mode((self.WINDOW_WIDTH, self.WINDOW_HEIGHT), win_flags)
         pygame.display.set_caption("SoundMania")
 

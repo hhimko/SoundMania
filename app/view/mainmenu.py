@@ -42,3 +42,7 @@ class MainMenuView(View):
     def render(self, surface: pygame.surface.Surface) -> None:
         surface.fill((255, 0, 0))
         self.menu_items.render(surface)
+        
+        
+    def on_window_resize(self) -> None:
+        self.menu_items._winpos_recompute()

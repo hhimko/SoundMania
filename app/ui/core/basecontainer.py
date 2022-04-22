@@ -53,8 +53,6 @@ class UIContainer(UIComponent, Generic[T]):
 
         for element in self.elements.values():
             element.render(surface)
-
-        # surface.blit(self.surface, self.position)
         
         
     def _winpos_recompute(self) -> None:

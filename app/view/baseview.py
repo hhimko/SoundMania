@@ -36,3 +36,9 @@ class View(ABC):
             Args:
                 surface: pygame Surface object on which to render. """
         pass
+    
+    
+    @abstractmethod
+    def on_window_resize(self) -> None:
+        """ Singly-triggered event on window being resized by the user. """
+        pass
