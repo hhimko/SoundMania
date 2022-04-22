@@ -10,7 +10,7 @@ class MenuItemList(UIContainer[Button]):
     """ Indexable container class for Button components. """
     def __init__(self, name: str, rect: _TupleI4 | pygame.Rect, *buttons: Button, **kwargs):
         super().__init__(name, rect, *buttons, **kwargs)
-        self.selected_index = 0
+        self._selected_index = 0
 
     
     def select_previous(self, wrap: bool=True) -> None:
@@ -19,13 +19,13 @@ class MenuItemList(UIContainer[Button]):
             Args:
                 wrap: tells whether to wrap the index around or clamp to the last item 
         """
-        idx = self.selected_index - 1
-        self.selected_index = idx % len(self) if wrap else max(idx, 0)
+        idx = self._selected_index - 1
+        self._selected_index = idx % len(self) if wrap else max(idx, 0)
     
     
     def select_enter(self) -> None:
         """ Execute `Button.on_mouse_click()` callback on currently selected button. """
-        self[self.selected_index].on_mouse_click()
+        self[self._selected_index].on_mouse_click()
 
 
     def select_next(self, wrap: bool=True) -> None:
@@ -34,8 +34,8 @@ class MenuItemList(UIContainer[Button]):
             Args:
                 wrap: tells whether to wrap the index around or clamp to the last item 
         """
-        idx = self.selected_index + 1
-        self.selected_index = idx % len(self.elements) if wrap else min(idx, len(self)-1)
+        idx = self._selected_index + 1
+        self._selected_index = idx % len(self) if wrap else min(idx, len(self)-1)
         
         
     def __len__(self) -> int:

@@ -16,10 +16,10 @@ class SoundMania:
     WINDOW_HEIGHT: int = 600
     
     def __init__(self):
+        self._pygame_init()
+        
         self.controller = ArduinoController()
         self.view = MainMenuView(root=self)
-        
-        self._pygame_init()
         
     
     def run(self) -> None:

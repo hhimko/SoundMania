@@ -7,13 +7,13 @@ from ui.core.basecomponent import UIComponent
 
 
 T = TypeVar('T', bound=UIComponent)
-
 class UIContainer(UIComponent, Generic[T]):
     def __init__(self, name: str, rect: _TupleI4 | pygame.Rect, *elements: T, **kwargs):
+        self.elements: dict[str, T] = {} # this has to appear before super().__init__() for config() attr lookup
         super().__init__(name, rect, **kwargs)
-        self.elements: dict[str, T] = {}
         
         for element in elements:
+            element.parent = self
             self.add(element)
 
             
@@ -49,12 +49,19 @@ class UIContainer(UIComponent, Generic[T]):
             Args:
                  surface: pygame `Surface` object on which to render
         """
-        self.surface.fill(self.color)
+        super().render(surface)
 
         for element in self.elements.values():
-            element.render(self.surface)
+            element.render(surface)
 
-        surface.blit(self.surface, (self.x, self.y))
+        # surface.blit(self.surface, self.position)
+        
+        
+    def _winpos_recompute(self) -> None:
+        super()._winpos_recompute()
+        
+        for element in self.elements.values():
+            element._winpos_recompute()
             
         
     def __getattr__(self, attr: str) -> T:

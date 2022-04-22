@@ -47,3 +47,4 @@ class callbackproperty(property):
         
     def deleter(self, obj: type) -> None:
         setattr(obj, self.callback_accessor, self.NO_OP)
+        

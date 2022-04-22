@@ -39,10 +39,6 @@ class Button(UIComponent):
         else: # mouse not over
             if self.is_mouse_over:
                 self._mouse_leaving()
-
-
-    def render(self, surface: pygame.surface.Surface) -> None:
-        surface.blit(self.surface, (self.x, self.y))
         
         
     def _mouse_entering(self) -> None:

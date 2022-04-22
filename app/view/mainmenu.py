@@ -9,9 +9,10 @@ class MainMenuView(View):
         super().__init__(root)
 
         # view layout
-        self.menu_items = MenuItemList("menu_container", (0,0,500,500),
-            Button("button_play", (100,100,100,50), text="PLAY", color=(255,255,255)),
-            Button("button_quit", (100,200,100,50), text="QUIT", color=(255,255,255))
+        self.menu_items = MenuItemList("menu_container", (0,0,200,200),
+            Button("button_play", (0,-50,100,50), centered=True, text="PLAY", color=(255,255,255)),
+            Button("button_quit", (0, 50,100,50), centered=True, text="QUIT", color=(255,255,255)),
+            centered=True
         )
 
         self.menu_items.button_play.on_mouse_click = lambda obj: print("PLAY")
