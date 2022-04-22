@@ -52,7 +52,7 @@ class SoundMania:
             if event.type == pygame.VIDEORESIZE:
                 self.view.on_window_resize()
             else:
-                # events unhandles here are passed for the view event handler
+                # events unhandled here are passed in to the view event handler
                 event_list.append(event)
                 
         self.view.handle_input(event_list)
