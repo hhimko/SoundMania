@@ -2,10 +2,12 @@ from abc import ABC, abstractmethod
 
 import pygame
 
+from soundmania import SoundMania
+
 
 class View(ABC):
     """ Abstract View class defining a common interface for creating app scenes. """
-    def __init__(self, root):
+    def __init__(self, root: SoundMania):
         self.root = root
         
         
@@ -42,3 +44,8 @@ class View(ABC):
     def on_window_resize(self) -> None:
         """ Singly-triggered event on window being resized by the user. """
         pass
+    
+    
+    def prepare(self):
+        """ Prepare the view to be properly displayed. """
+        self.on_window_resize()

@@ -1,5 +1,8 @@
+from __future__ import annotations
+from functools import cache
+
 import logging
-logging.basicConfig(level="INFO", 
+logging.basicConfig(level="DEBUG", 
                     format="[{levelname}][{asctime}] {name}: {message}", 
                     style='{', 
                     datefmt=f"%H:%M:%S")
@@ -8,7 +11,7 @@ import pygame
 pygame.init()
 
 from arduino_controller import ArduinoController
-from view import MainMenuView
+import view  # import just the module name to avoid circular import
 
 
 class SoundMania:
@@ -19,30 +22,48 @@ class SoundMania:
         self._pygame_init()
         
         self.controller = ArduinoController()
-        self.view = MainMenuView(root=self)
+        self.view = self.get_view(view.MainMenuView)
         
     
+    @cache
+    def get_view(self, view: type[view.View]) -> view.View:
+        """ Cached getter of view objects. """
+        logging.debug(f"Initializing view {view.__name__}")
+        return view(root=self)
+    
+    
+    def request_view_change(self, view: type[view.View]) -> None:
+        if view != type(self.view):
+            self.view = self.get_view(view)
+            self.view.prepare()
+    
+    
+    def request_transition_play(self, transition: str) -> None:
+        pass
+        
+        
+    def request_quit(self) -> None:
+        self._running = False
+        
+        
     def run(self) -> None:
         self._running = True
-        self.mainloop()
+        self._mainloop()
     
     
-    def mainloop(self) -> None:
+    def _mainloop(self) -> None:
         while self._running:
             dt = self.clock.tick()
+            view = self.view
 
             self._handle_events()
-            self.view.update(dt)
-            self.view.render(self.screen_surface)
+            view.update(dt)
+            view.render(self.screen_surface)
             
             pygame.display.flip()
             pygame.display.set_caption(f"SoundMania | FPS: {round(self.clock.get_fps())}")
             
         self._shutdown()
-        
-        
-    def quit(self) -> None:
-        self._running = False
         
         
     def _handle_events(self) -> None:

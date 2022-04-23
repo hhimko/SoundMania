@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import pygame
 
 from ui import Button, MenuItemList
@@ -8,23 +6,18 @@ from view.baseview import View
 import view
 
 
-class MainMenuView(View):
+class MapIndexView(View):
     def __init__(self, root):
         super().__init__(root)
 
         # view layout
-        self.menu_items = MenuItemList("menu_container", (0, 0, vw(70), vh(50)),
-            Button("button_play", (0, vh(-10), vw(50), vh(10)), 
-                    centered=True, text="PLAY", color=(255,255,255)
-                   ),
-            Button("button_quit", (0, vh( 10), vw(50), vh(10)),
-                    centered=True, text="QUIT", color=(255,255,255)
-                    ),
-            centered = True
+        self.menu_items = MenuItemList("menu_container", (0, vh(70), vw(100), vh(30)),
+            Button("button_return", (0, vh(20), vw(100), vh(10)),
+                        text="- R E T U R N -", color=(255,255,255)
+                    )
         )
 
-        self.menu_items.button_play.on_mouse_click = self._button_play_callback
-        self.menu_items.button_quit.on_mouse_click = self._button_quit_callback
+        self.menu_items.button_return.on_mouse_click = self._button_return_callback
         
 
     def handle_input(self, event_list: list[pygame.event.Event]) -> None:
@@ -56,11 +49,7 @@ class MainMenuView(View):
         self.menu_items._on_window_resize()
         
         
-    def _button_play_callback(self, obj: Button) -> None:
-        self.root.request_view_change(view.MapIndexView)
-        
-        
-    def _button_quit_callback(self, obj: Button) -> None:
+    def _button_return_callback(self, obj: Button) -> None:
         self.root.request_transition_play('')
-        self.root.request_quit()
+        self.root.request_view_change(view.MainMenuView)
     
