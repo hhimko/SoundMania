@@ -28,7 +28,7 @@ class UIComponent:
         self._color: _ColorRGB | _ColorRGBA = (0,0,0)
 
         self._text = ''
-        self._text_size = self.height
+        self._text_size = self._height
         self._text_color: _ColorRGB | _ColorRGBA = (0,0,0)
 
         self.config(**kwargs)
@@ -169,7 +169,11 @@ class UIComponent:
     
     @property
     def text_size(self) -> int:
-        return int(self._text_size)
+        attr = self._text_size
+        if isinstance(attr, EvalAttrProxy):
+            return attr.evaluate(self)
+        
+        return int(attr)
 
     
     @text_size.setter
@@ -248,6 +252,7 @@ class UIComponent:
         
         
     def _redraw_surface(self) -> None:
+        """ Executed before render when `self.is_dirty` is set to `True`. """
         self.surface.fill(self.color)
         if self.text:
             self._redraw_text()
@@ -266,10 +271,3 @@ class UIComponent:
         
         self._winpos_recompute()
         
-        
-    def __getattribute__(self, name: str) -> Any:
-        attr =  super().__getattribute__(name)
-        if isinstance(attr, EvalAttrProxy):
-            attr = attr.evaluate(self)
-            
-        return attr
