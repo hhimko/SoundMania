@@ -70,9 +70,9 @@ class UIContainer(UIComponent, Generic[T]):
             
         
     def __getattr__(self, attr: str) -> T:
-        # TODO: depthen lookup by iterating through containers
         element = self.elements.get(attr) 
         if element is None:
             raise AttributeError(f"container '{self.name} does not contain element with name '{attr}''")
         
         return element
+    

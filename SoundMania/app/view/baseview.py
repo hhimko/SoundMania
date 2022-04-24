@@ -1,13 +1,14 @@
+from __future__ import annotations
 from abc import ABC, abstractmethod
 
 import pygame
 
-from soundmania import SoundMania
+import soundmania
 
 
 class View(ABC):
     """ Abstract View class defining a common interface for creating app scenes. """
-    def __init__(self, root: SoundMania):
+    def __init__(self, root: soundmania.SoundMania):
         self.root = root
         
         
@@ -49,3 +50,4 @@ class View(ABC):
     def prepare(self):
         """ Prepare the view to be properly displayed. """
         self.on_window_resize()
+    

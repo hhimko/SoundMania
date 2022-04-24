@@ -1,6 +1,6 @@
 import pygame
 
-from ui import Button, MenuItemList
+from ui import Button, MenuItemList, MapIndex
 from ui.core.units import vw, vh
 from view.baseview import View
 import view
@@ -11,13 +11,14 @@ class MapIndexView(View):
         super().__init__(root)
 
         # view layout
-        self.menu_items = MenuItemList("menu_container", (0, vh(70), vw(100), vh(30)),
-            Button("button_return", (0, vh(20), vw(100), vh(10)),
-                        text="- R E T U R N -", color=(255,255,255)
-                    )
+        self.button_return = Button("button_return", (0,0,200,50), text="RETURN", text_color=(255,255,255))
+        self.button_return.on_mouse_click = self._button_return_callback
+        
+        self.map_index = MapIndex()
+        
+        self.options_menu = MenuItemList("options_menu_container", (0, vh(70), vw(100), vh(30)),
+                Button("button_return", (0, vh(20), vw(100), vh(10)), text="RETURN", color=(255,255,255))
         )
-
-        self.menu_items.button_return.on_mouse_click = self._button_return_callback
         
 
     def handle_input(self, event_list: list[pygame.event.Event]) -> None:
@@ -27,26 +28,26 @@ class MapIndexView(View):
 
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_UP:
-                    self.menu_items.select_previous()
+                    self.options_menu.select_previous()
 
                 elif event.key == pygame.K_RETURN:
-                    self.menu_items.select_enter()
+                    self.options_menu.select_enter()
                     
                 elif event.key == pygame.K_DOWN:
-                    self.menu_items.select_next()
+                    self.options_menu.select_next()
                 
             
     def update(self, dt: int) -> None:
-        self.menu_items.update(dt)
+        self.button_return.update(dt)
     
     
     def render(self, surface: pygame.surface.Surface) -> None:
         surface.fill((255, 0, 0))
-        self.menu_items.render(surface)
+        self.button_return.render(surface)
         
         
     def on_window_resize(self) -> None:
-        self.menu_items._on_window_resize()
+        self.button_return._on_window_resize()
         
         
     def _button_return_callback(self, obj: Button) -> None:

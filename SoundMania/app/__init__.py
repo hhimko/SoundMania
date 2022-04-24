@@ -1,0 +1,1 @@
+from soundmania import SoundMania
