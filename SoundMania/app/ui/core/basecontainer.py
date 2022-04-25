@@ -13,8 +13,8 @@ class UIContainer(UIComponent, Generic[T]):
         super().__init__(name, rect, **kwargs)
         
         for element in elements:
-            element.parent = self
             self.add(element)
+            element.parent = self
 
             
     def add(self, element: T) -> None:

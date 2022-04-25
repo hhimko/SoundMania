@@ -1,4 +1,4 @@
-from serialdevice import SerialDevice
+from core.serialdevice import SerialDevice
 
 import logging
 logger = logging.getLogger("ArduinoController")

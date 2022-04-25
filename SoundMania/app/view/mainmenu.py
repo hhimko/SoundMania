@@ -3,7 +3,7 @@ from __future__ import annotations
 import pygame
 
 from ui import Button, MenuItemList
-from ui.core.units import vw, vh
+from ui.core.units import pw, vh
 from view.baseview import View
 import view
 
@@ -14,10 +14,10 @@ class MainMenuView(View):
 
         # view layout
         self.menu_items = MenuItemList("menu_container", (0, 0, vh(70), vh(50)),
-            Button("button_play", (0, vh(-10), vh(60), vh(10)), 
+            Button("button_play", (0, vh(-10), pw(80), vh(10)), 
                 centered=True, text="PLAY", color=(255,255,255)
             ),
-            Button("button_quit", (0, vh( 10), vh(60), vh(10)),
+            Button("button_quit", (0, vh( 10), pw(80), vh(10)),
                 centered=True, text="QUIT", color=(255,255,255)
             ),
             centered = True

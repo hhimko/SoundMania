@@ -54,13 +54,13 @@ class callbackproperty(property):
 
 class EvalAttrProxy(ABC):
     def __init__(self, value: float):
-        self.value = self.preprocess(value)
-    
-    
-    def preprocess(self, value: float) -> float:
-        return value
-    
-    
+        self.value = value
+        
+        
     @abstractmethod
     def evaluate(self, obj) -> Any:
         pass
+    
+    
+    def __repr__(self) -> str:
+        return f"{type(self).__name__}({self.value})"

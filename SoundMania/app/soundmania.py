@@ -11,7 +11,6 @@ logger = logging.getLogger("SoundMania")
 import pygame
 pygame.init()
 
-from arduino_controller import ArduinoController
 from core.mapmanager import MapManager
 import view  # import just the module name to avoid circular import
 
@@ -25,7 +24,6 @@ class SoundMania:
         
         self.map_manager = MapManager()
         
-        self.controller = ArduinoController()
         self.view = self.get_view(view.MainMenuView)
         
     

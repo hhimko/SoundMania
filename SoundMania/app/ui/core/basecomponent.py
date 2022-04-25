@@ -47,7 +47,7 @@ class UIComponent:
             raise ValueError(f"object {self} already has a parent {self.parent} assigned")
         
         self._parent = value
-        self._winpos_recompute()
+        self._on_window_resize() # mandatory for components with size units relative to their parents
         
         
     @property
