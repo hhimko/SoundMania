@@ -14,27 +14,36 @@ class MenuItemList(UIContainer[Button]):
         self._selected_index = 0
 
     
-    def select_previous(self, wrap: bool=True) -> None:
+    def select_previous(self, wrap: bool = True) -> None:
         """ Decrement the currenty selected button index.
             
             Args:
                 wrap: tells whether to wrap the index around or clamp to the last item 
         """
+        if len(self) == 0:
+            return
+        
         idx = self._selected_index - 1
         self._selected_index = idx % len(self) if wrap else max(idx, 0)
     
     
     def select_enter(self) -> None:
         """ Execute `Button.on_mouse_click()` callback on currently selected button. """
+        if len(self) == 0:
+            return
+
         self[self._selected_index].on_mouse_click()
 
 
-    def select_next(self, wrap: bool=True) -> None:
+    def select_next(self, wrap: bool = True) -> None:
         """ Increment the currenty selected button index.
             
             Args:
                 wrap: tells whether to wrap the index around or clamp to the last item 
         """
+        if len(self) == 0:
+            return
+        
         idx = self._selected_index + 1
         self._selected_index = idx % len(self) if wrap else min(idx, len(self)-1)
         

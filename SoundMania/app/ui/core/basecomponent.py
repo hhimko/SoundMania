@@ -1,11 +1,11 @@
 from __future__ import annotations
 from functools import cached_property
-from typing import Any
 
 import pygame
 
 from ui.core.type import _ColorRGB, _ColorRGBA, _Unit, _UnitRect
 from ui.core.core import EvalAttrProxy
+
 
 def _read_size_from_rect(rect: _UnitRect | pygame.Rect) -> _UnitRect:
     if isinstance(rect, pygame.Rect):
@@ -18,6 +18,8 @@ class UIComponent:
     def __init__(self, name: str, rect: _UnitRect | pygame.Rect, **kwargs):
         self.name = name
         self._parent: UIComponent | None = None
+        
+        self.hidden = False
         self.is_dirty = True # forces the surface to be redrawn on first render
 
         self._x, self._y, self._width, self._height = _read_size_from_rect(rect)
@@ -226,10 +228,11 @@ class UIComponent:
             Args:
                 surface: pygame `Surface` object on which to render
         """
-        if self.is_dirty:
-            self._redraw_surface()
-            
-        surface.blit(self.surface, self._winpos)
+        if not self.hidden:
+            if self.is_dirty:
+                self._redraw_surface()
+                
+            surface.blit(self.surface, self._winpos)
         
         
     @cached_property

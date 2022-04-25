@@ -14,8 +14,6 @@ class MapInfo:
     song_duration: int=0
     
     
-    
-
 class MapManager:
     MAP_EXTENSION = ".smm"
     INFO_FILE_NAME = "info"

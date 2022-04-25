@@ -1,6 +1,6 @@
 import pygame
 
-from ui import Button, MenuItemList, MapIndex
+from ui import Button, MapIndex
 from ui.core.units import vw, vh
 from view.baseview import View
 import view
@@ -11,14 +11,10 @@ class MapIndexView(View):
         super().__init__(root)
 
         # view layout
-        self.button_return = Button("button_return", (0,0,200,50), text="RETURN", text_color=(255,255,255))
+        self.button_return = Button("button_return", (0,vh(90),vw(100),vh(10)), text="RETURN", text_color=(255,255,255))
         self.button_return.on_mouse_click = self._button_return_callback
         
-        self.map_index = MapIndex()
-        
-        self.options_menu = MenuItemList("options_menu_container", (0, vh(70), vw(100), vh(30)),
-                Button("button_return", (0, vh(20), vw(100), vh(10)), text="RETURN", color=(255,255,255))
-        )
+        self.map_index = MapIndex(root, "map_index", (0, vh(-5), vw(60), vh(90)), centered=True)
         
 
     def handle_input(self, event_list: list[pygame.event.Event]) -> None:
@@ -28,26 +24,30 @@ class MapIndexView(View):
 
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_UP:
-                    self.options_menu.select_previous()
+                    self.map_index.select_previous()
 
                 elif event.key == pygame.K_RETURN:
-                    self.options_menu.select_enter()
+                    print(self.map_index._map_paths[self.map_index._selected_index])
+                    # self.options_menu.select_enter()
                     
                 elif event.key == pygame.K_DOWN:
-                    self.options_menu.select_next()
+                    self.map_index.select_next()
                 
             
     def update(self, dt: int) -> None:
+        self.map_index.update(dt)
         self.button_return.update(dt)
     
     
     def render(self, surface: pygame.surface.Surface) -> None:
         surface.fill((255, 0, 0))
+        self.map_index.render(surface)
         self.button_return.render(surface)
         
         
     def on_window_resize(self) -> None:
         self.button_return._on_window_resize()
+        self.map_index._on_window_resize()
         
         
     def _button_return_callback(self, obj: Button) -> None:

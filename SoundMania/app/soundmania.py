@@ -6,6 +6,7 @@ logging.basicConfig(level="DEBUG",
                     format="[{levelname}][{asctime}] {name}: {message}", 
                     style='{', 
                     datefmt=f"%H:%M:%S")
+logger = logging.getLogger("SoundMania")
 
 import pygame
 pygame.init()
@@ -16,8 +17,8 @@ import view  # import just the module name to avoid circular import
 
 
 class SoundMania:
-    WINDOW_WIDTH: int  = 800
-    WINDOW_HEIGHT: int = 600
+    WINDOW_WIDTH: int  = 1600
+    WINDOW_HEIGHT: int = 900
     
     def __init__(self):
         self._pygame_init()
@@ -31,11 +32,12 @@ class SoundMania:
     @cache
     def get_view(self, view: type[view.View]) -> view.View:
         """ Cached getter of view objects. """
-        logging.debug(f"Initializing view {view.__name__}")
+        logger.debug(f"Initializing view {view.__name__}")
         return view(root=self)
     
     
     def request_view_change(self, view: type[view.View]) -> None:
+        """ Make a request of changing the current view. """
         if view != type(self.view):
             self.view = self.get_view(view)
             self.view.prepare()
@@ -46,6 +48,7 @@ class SoundMania:
         
         
     def request_quit(self) -> None:
+        """ Make a request of shutting down the application. """
         self._running = False
         
         

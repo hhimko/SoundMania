@@ -9,7 +9,7 @@ from ui.core.basecomponent import UIComponent
 T = TypeVar('T', bound=UIComponent)
 class UIContainer(UIComponent, Generic[T]):
     def __init__(self, name: str, rect: _UnitRect | pygame.Rect, *elements: T, **kwargs):
-        self.elements: dict[str, T] = {} # this has to appear before super().__init__() for config() attr lookup
+        self.elements: dict[str, T] = {}
         super().__init__(name, rect, **kwargs)
         
         for element in elements:
@@ -70,6 +70,9 @@ class UIContainer(UIComponent, Generic[T]):
             
         
     def __getattr__(self, attr: str) -> T:
+        if not "elements" in dir(self):
+            raise KeyError(f"Container '{self.name}' is missing 'self.elements'")
+        
         element = self.elements.get(attr) 
         if element is None:
             raise AttributeError(f"container '{self.name} does not contain element with name '{attr}''")

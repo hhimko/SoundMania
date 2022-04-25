@@ -13,11 +13,11 @@ class MainMenuView(View):
         super().__init__(root)
 
         # view layout
-        self.menu_items = MenuItemList("menu_container", (0, 0, vw(70), vh(50)),
-            Button("button_play", (0, vh(-10), vw(50), vh(10)), 
+        self.menu_items = MenuItemList("menu_container", (0, 0, vh(70), vh(50)),
+            Button("button_play", (0, vh(-10), vh(60), vh(10)), 
                 centered=True, text="PLAY", color=(255,255,255)
             ),
-            Button("button_quit", (0, vh( 10), vw(50), vh(10)),
+            Button("button_quit", (0, vh( 10), vh(60), vh(10)),
                 centered=True, text="QUIT", color=(255,255,255)
             ),
             centered = True
