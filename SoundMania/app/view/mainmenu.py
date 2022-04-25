@@ -23,7 +23,7 @@ class MainMenuView(View):
             centered = True
         )
 
-        self.menu_items.button_play.on_mouse_click = self._button_play_callback
+        self.menu_items.button_play.on_mouse_click = lambda obj: self.root.request_view_change(view.MapIndexView)
         self.menu_items.button_quit.on_mouse_click = self._button_quit_callback
         
 
@@ -41,6 +41,12 @@ class MainMenuView(View):
                     
                 elif event.key == pygame.K_DOWN:
                     self.menu_items.select_next()
+                    
+                elif event.key == pygame.K_p:
+                    self.root.request_view_change(view.MapIndexView)
+                    
+                elif event.key in (pygame.K_ESCAPE, pygame.K_q):
+                    self.root.request_quit()
                 
             
     def update(self, dt: int) -> None:
@@ -54,10 +60,6 @@ class MainMenuView(View):
         
     def on_window_resize(self) -> None:
         self.menu_items._on_window_resize()
-        
-        
-    def _button_play_callback(self, obj: Button) -> None:
-        self.root.request_view_change(view.MapIndexView)
         
         
     def _button_quit_callback(self, obj: Button) -> None:

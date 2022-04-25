@@ -10,7 +10,7 @@ logger = logging.getLogger("MapManager")
 class MapInfo:
     map_path: str
     song_author: str
-    song_name: str
+    song_title: str
     song_duration: int=0
     
     
@@ -26,7 +26,20 @@ class MapManager:
     
     def __init__(self): 
         self.local_path = self._get_user_path()
-        self._map_cache: dict[str, MapInfo] = {}
+        self._map_info_cache: dict[str, MapInfo] = {}
+        
+        
+    def get_map_info(self, path: str) -> MapInfo:
+        map_info = self._map_info_cache.get(path)
+        
+        if not map_info:
+            full_path = os.path.join(self.local_path, path)
+            if self._register_map(full_path):
+                map_info = self._map_info_cache[path]
+            else:
+                raise KeyError(f"map could not be located at '{path}'")
+    
+        return map_info
     
     
     def load_available_maps(self) -> list[str]:
@@ -47,7 +60,7 @@ class MapManager:
         if not map_info:
             return False
         
-        self._map_cache[path] = map_info
+        self._map_info_cache[path] = map_info
         return True
     
     

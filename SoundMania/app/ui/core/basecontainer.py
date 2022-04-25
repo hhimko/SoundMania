@@ -1,4 +1,4 @@
-from typing import Generic, TypeVar
+from typing import Iterator, Generic, TypeVar
 
 import pygame
 
@@ -15,6 +15,17 @@ class UIContainer(UIComponent, Generic[T]):
         for element in elements:
             self.add(element)
             element.parent = self
+
+    @property
+    def hidden(self) -> bool:
+        return self._hidden
+    
+    
+    @hidden.setter
+    def hidden(self, value: bool) -> None:
+        self._hidden = value
+        for element in self:
+            element.hidden = value
 
             
     def add(self, element: T) -> None:
@@ -38,7 +49,7 @@ class UIContainer(UIComponent, Generic[T]):
             Args:
                 dt: elapsed time since the last frame
         """
-        for element in self.elements.values():
+        for element in self:
             element.update(dt)
 
 
@@ -51,21 +62,21 @@ class UIContainer(UIComponent, Generic[T]):
         """
         super().render(surface)
 
-        for element in self.elements.values():
+        for element in self:
             element.render(surface)
         
         
     def _winpos_recompute(self) -> None:
         super()._winpos_recompute()
         
-        for element in self.elements.values():
+        for element in self:
             element._winpos_recompute()
             
             
     def _on_window_resize(self) -> None:
         super()._on_window_resize()
         
-        for element in self.elements.values():
+        for element in self:
             element._on_window_resize()
             
         
@@ -75,7 +86,19 @@ class UIContainer(UIComponent, Generic[T]):
         
         element = self.elements.get(attr) 
         if element is None:
-            raise AttributeError(f"container '{self.name} does not contain element with name '{attr}''")
+            raise AttributeError(f"container '{self.name}' does not contain element with name '{attr}'")
         
         return element
+    
+    
+    def __len__(self) -> int:
+        return len(self.elements)
+        
+        
+    def __iter__(self) -> Iterator[T]:
+        return iter(self.elements.values())
+    
+    
+    def __getitem__(self, index: int) -> T:
+        return list(self.elements.values())[index]
     

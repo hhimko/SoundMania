@@ -12,7 +12,7 @@ class MapIndexView(View):
 
         # view layout
         self.button_return = Button("button_return", (0,vh(90),vw(100),vh(10)), text="RETURN", text_color=(255,255,255))
-        self.button_return.on_mouse_click = self._button_return_callback
+        self.button_return.on_mouse_click = lambda obj: self.root.request_view_change(view.MainMenuView)
         
         self.map_index = MapIndex(root, "map_index", (0, vh(-5), vw(60), vh(90)), centered=True)
         
@@ -27,11 +27,13 @@ class MapIndexView(View):
                     self.map_index.select_previous()
 
                 elif event.key == pygame.K_RETURN:
-                    print(self.map_index._map_paths[self.map_index._selected_index])
-                    # self.options_menu.select_enter()
+                    self.map_index.select_enter()
                     
                 elif event.key == pygame.K_DOWN:
                     self.map_index.select_next()
+                    
+                elif event.key == pygame.K_END:
+                    self.root.request_view_change(view.MainMenuView)
                 
             
     def update(self, dt: int) -> None:
@@ -49,8 +51,3 @@ class MapIndexView(View):
         self.button_return._on_window_resize()
         self.map_index._on_window_resize()
         
-        
-    def _button_return_callback(self, obj: Button) -> None:
-        self.root.request_transition_play('')
-        self.root.request_view_change(view.MainMenuView)
-    

@@ -19,7 +19,7 @@ class UIComponent:
         self.name = name
         self._parent: UIComponent | None = None
         
-        self.hidden = False
+        self._hidden = False
         self.is_dirty = True # forces the surface to be redrawn on first render
 
         self._x, self._y, self._width, self._height = _read_size_from_rect(rect)
@@ -134,6 +134,16 @@ class UIComponent:
     @size.setter
     def size(self, value: tuple[_Unit, _Unit]) -> None:
         self.width, self.height = value
+        
+        
+    @property
+    def hidden(self) -> bool:
+        return self._hidden
+    
+    
+    @hidden.setter
+    def hidden(self, value: bool) -> None:
+        self._hidden = value
         
 
     @property
@@ -264,7 +274,7 @@ class UIComponent:
 
 
     def _redraw_text(self) -> None:
-        overlay = pygame.font.Font(None, self.text_size).render(self.text, True, self.text_color)
+        overlay = pygame.font.Font(None, int(self.text_size)).render(self.text, True, self.text_color)
         self.surface.blit(overlay, (0,0))
         
         
