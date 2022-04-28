@@ -58,8 +58,9 @@ class MapIndex(UIContainer):
         """ Select and play current map. """
         if len(self) == 0:
             return
-
-        print(self._map_paths[self._selected_index])
+        
+        selected = self._get_component_relative(0)
+        selected.button_overlay.on_mouse_click()
     
     
     def select_next(self, wrap: bool = True) -> None:
@@ -113,13 +114,13 @@ class MapIndex(UIContainer):
                 component.section_title.text = map_info.song_title
                 component.section_author.text = map_info.song_author
                 
-                component.button_overlay.on_mouse_click = self._get_button_callback(map_path)
+                component.button_overlay.on_mouse_click = self._get_button_callback(map_info.song_path)
                 
             component._on_window_resize()
             
             
-    def _get_button_callback(self, map_path: str) -> Callable:
-        return lambda obj: print(map_path)
+    def _get_button_callback(self, song_path: str) -> Callable:
+        return lambda _: print(song_path)
             
     
     def _on_window_resize(self) -> None:

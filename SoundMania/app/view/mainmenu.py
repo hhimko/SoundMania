@@ -4,11 +4,10 @@ import pygame
 
 from ui import Button, MenuItemList
 from ui.core.units import pw, vh
-from view.baseview import View
 import view
 
 
-class MainMenuView(View):
+class MainMenuView(view.View):
     def __init__(self, root):
         super().__init__(root)
 
@@ -45,7 +44,7 @@ class MainMenuView(View):
                 elif event.key == pygame.K_p:
                     self.root.request_view_change(view.MapIndexView)
                     
-                elif event.key in (pygame.K_ESCAPE, pygame.K_q):
+                elif event.key == pygame.K_q:
                     self.root.request_quit()
                 
             

@@ -11,7 +11,7 @@ class MapInfo:
     map_path: str
     song_author: str
     song_title: str
-    song_duration: int=0
+    song_path: str
     
     
 class MapManager:
@@ -30,6 +30,7 @@ class MapManager:
         
         
     def get_map_info(self, path: str) -> MapInfo:
+        """ Extract a MapInfo object from a specified path to an existing map directory. """
         map_info = self._map_info_cache.get(path)
         
         if not map_info:
@@ -66,6 +67,11 @@ class MapManager:
     
     @classmethod
     def _parse_map_info(cls, path: str) -> MapInfo | None:
+        """ Validate and parse a map directory. 
+            
+            Returns:
+                a new MapInfo object on successful parse, otherwise `None` 
+        """
         if os.path.isdir(path) and path.endswith(cls.MAP_EXTENSION):
             info_file_path = os.path.join(path, cls.INFO_FILE_NAME)
             
@@ -76,20 +82,26 @@ class MapManager:
             with open(info_file_path, 'r') as info_file:
                 author = info_file.readline().strip() or "???"
                 name = info_file.readline().strip() or "???"
-                try:
-                    duration = int(info_file.readline().strip())
-                except ValueError:
-                    logger.warn(f"{path} map exists, but info file is corrupted")
-                    return None 
+                
+                music_paths = [p for p in os.listdir(path) if p.endswith((".mp3", ".ogg"))]
+                if not music_paths:
+                    logger.warn(f"{path} map exists, but music file is missing")
+                    return None
+                
+                if len(music_paths) > 1:
+                    logger.warn(f"{path} map exists, but contains multiple music files, and the result is ambiguous")
+                    return None
+                
+                song_path = os.path.join(path, music_paths[0])
             
-            return MapInfo(path, author, name, duration)
+            return MapInfo(path, author, name, song_path)
         
         return None
     
     
     @classmethod
     def _get_user_path(cls) -> str:
-        config = configparser.ConfigParser()
+        config = configparser.ConfigParser() # TODO: probably extract config parsing to a distinct file manager
         config.read(cls.CONF_PATH)
         
         try:

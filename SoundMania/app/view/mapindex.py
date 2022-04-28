@@ -32,7 +32,7 @@ class MapIndexView(View):
                 elif event.key == pygame.K_DOWN:
                     self.map_index.select_next()
                     
-                elif event.key == pygame.K_END:
+                elif event.key == pygame.K_ESCAPE:
                     self.root.request_view_change(view.MainMenuView)
                 
             
