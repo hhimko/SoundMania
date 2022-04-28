@@ -4,8 +4,6 @@ import logging
 logger = logging.getLogger("RequestQueue")
 
 
-
-
 class _Request:
     def __init__(self, callback: Callable, timeout: int):
         self.callback = callback

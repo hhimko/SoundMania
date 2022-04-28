@@ -34,6 +34,9 @@ class MapIndexView(View):
                     
                 elif event.key == pygame.K_ESCAPE:
                     self.root.request_view_change(view.MainMenuView)
+                    
+                elif event.key == pygame.K_z:
+                     print(abs((pygame.mixer.music.get_pos() / (1000 / (140/60))) % 1 - 0.5) * 100)
                 
             
     def update(self, dt: int) -> None:

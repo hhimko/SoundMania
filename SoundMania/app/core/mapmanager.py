@@ -46,13 +46,13 @@ class MapManager:
     def load_available_maps(self) -> list[str]:
         """ Load to the managers cache and return all avaiable map paths. """
         available = [] 
-        
         for path in os.listdir(self.local_path):
             full_path = os.path.join(self.local_path, path)
             
             if self._register_map(full_path):
                 available.append(full_path)
                 
+        logger.info(f"Successfully loaded {len(available)} maps")
         return available
     
     

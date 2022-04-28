@@ -37,15 +37,17 @@ class SoundMania:
         if type(self.view_manager.get_current_view()) != view:
             request = partial(self.view_manager.set_view, view=view, root=self)
             self.request_queue.add(request)
-            
-            
-    def request_view_background(self, bg_name: str) -> None:
-        pass
     
     
     def request_transition_out(self, duration: int) -> None:
+        """ Make a request of playing the out transition for `duration` miliseconds. """
         request = partial(self.view_manager.transition_out, duration)
         self.request_queue.add(request, timeout=duration)
+        
+        
+    def request_song_play(self, song_path: str) -> None:
+        pygame.mixer.music.load(song_path)
+        pygame.mixer.music.play()
         
         
     def request_quit(self) -> None:

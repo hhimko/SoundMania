@@ -2,9 +2,6 @@ from __future__ import annotations
 from typing import Callable
 from math import ceil
 
-import logging
-logger = logging.getLogger("MapIndex")
-
 import pygame
 
 from ui.core import UIComponent, UIContainer
@@ -25,7 +22,7 @@ class MapIndex(UIContainer):
         
         self._visible_count = self._calculate_visible_count() 
         self._map_paths = self.root.map_manager.load_available_maps()
-        logger.info(f"Successfully loaded {len(self._map_paths)} maps")
+        
         
     
     def get_prefab(self) -> UIContainer:
@@ -116,11 +113,14 @@ class MapIndex(UIContainer):
                 
                 component.button_overlay.on_mouse_click = self._get_button_callback(map_info.song_path)
                 
+                if i == 0:
+                    self.root.request_song_play(map_info.song_path)
+                
             component._on_window_resize()
             
             
     def _get_button_callback(self, song_path: str) -> Callable:
-        return lambda _: print(song_path)
+        return lambda _: self.root.request_song_play(song_path)
             
     
     def _on_window_resize(self) -> None:
@@ -136,6 +136,4 @@ class MapIndex(UIContainer):
         
     def __len__(self) -> int:
         return len(self._map_paths)
-    
-    
     
