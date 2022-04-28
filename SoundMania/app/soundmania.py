@@ -1,68 +1,73 @@
-from __future__ import annotations
-from functools import cache
-
-import logging
-logging.basicConfig(level="DEBUG", 
-                    format="[{levelname}][{asctime}] {name}: {message}", 
-                    style='{', 
-                    datefmt=f"%H:%M:%S")
-logger = logging.getLogger("SoundMania")
+from functools import partial
 
 import pygame
-pygame.init()
 
+from core.requestqueue import RequestQueue
+from core.viewmanager import ViewManager
 from core.mapmanager import MapManager
+
 import view  # import just the module name to avoid circular import
 
 
 class SoundMania:
+    """ Root application class responsible for handling communication between views and managers. """
     WINDOW_WIDTH: int  = 1600
     WINDOW_HEIGHT: int = 900
     
     def __init__(self):
-        self._pygame_init()
+        pygame.init()
+        self.display_surface = self._get_display()
+        self.clock = pygame.time.Clock()
         
+        self.request_queue = RequestQueue()
+        self.view_manager = ViewManager()
         self.map_manager = MapManager()
         
-        self.view = self.get_view(view.MainMenuView)
         
-    
-    @cache
-    def get_view(self, view: type[view.View]) -> view.View:
-        """ Cached getter of view objects. """
-        logger.debug(f"Initializing view {view.__name__}")
-        return view(root=self)
+    def run(self) -> None:
+        """ Set up and run the application. """
+        self.view_manager.set_view(view.MainMenuView, root=self)
+        self.running = True
+        
+        self._mainloop()
     
     
     def request_view_change(self, view: type[view.View]) -> None:
         """ Make a request of changing the current view. """
-        if view != type(self.view):
-            self.view = self.get_view(view)
-            self.view.prepare()
-    
-    
-    def request_transition_play(self, transition: str) -> None:
+        if type(self.view_manager.get_current_view()) != view:
+            request = partial(self.view_manager.set_view, view=view, root=self)
+            self.request_queue.add(request)
+            
+            
+    def request_view_background(self, bg_name: str) -> None:
         pass
+    
+    
+    def request_transition_out(self, duration: int) -> None:
+        request = partial(self.view_manager.transition_out, duration)
+        self.request_queue.add(request, timeout=duration)
         
         
     def request_quit(self) -> None:
         """ Make a request of shutting down the application. """
-        self._running = False
-        
-        
-    def run(self) -> None:
-        self._running = True
-        self._mainloop()
+        def request():
+            self.running = False
+            
+        self.request_queue.add(request)
     
     
     def _mainloop(self) -> None:
-        while self._running:
+        while self.running:
             dt = self.clock.tick()
-            view = self.view
-
-            self._handle_events()
-            view.update(dt)
-            view.render(self.screen_surface)
+            event_list = pygame.event.get()
+            
+            self.view_manager.handle_events(event_list)
+            
+            self.view_manager.update(dt)
+            self.request_queue.process(dt)
+            
+            self.view_manager.render(self.display_surface)
+            
             
             pygame.display.flip()
             pygame.display.set_caption(f"SoundMania | FPS: {round(self.clock.get_fps())}")
@@ -70,26 +75,12 @@ class SoundMania:
         self._shutdown()
         
         
-    def _handle_events(self) -> None:
-        event_list = []
-        
-        for event in pygame.event.get():
-            if event.type == pygame.VIDEORESIZE:
-                self.view.on_window_resize()
-            else:
-                # events unhandled here are passed in to the view event handler
-                event_list.append(event)
-                
-        self.view.handle_input(event_list)
-        
-        
-    def _pygame_init(self) -> None:        
+    def _get_display(self) -> pygame.surface.Surface:        
         win_flags = pygame.RESIZABLE
-        self.screen_surface = pygame.display.set_mode((self.WINDOW_WIDTH, self.WINDOW_HEIGHT), win_flags)
-        pygame.display.set_caption("SoundMania")
-
-        self.clock = pygame.time.Clock()
+        surface = pygame.display.set_mode((self.WINDOW_WIDTH, self.WINDOW_HEIGHT), win_flags)
+        return surface
         
         
     def _shutdown(self) -> None:
         pygame.quit()
+        
