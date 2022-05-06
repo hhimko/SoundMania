@@ -24,7 +24,6 @@ class MapIndex(UIContainer):
         self._map_paths = self.root.map_manager.load_available_maps()
         
         
-    
     def get_prefab(self) -> UIContainer:
         """ Return a new GUI map object based on a prefab. """
         # container elements need to be instantiated separately to avoid shallow copying

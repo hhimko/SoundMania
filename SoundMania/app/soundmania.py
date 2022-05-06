@@ -5,6 +5,7 @@ import pygame
 from core.requestqueue import RequestQueue
 from core.viewmanager import ViewManager
 from core.mapmanager import MapManager
+from core.configio import ConfigIO
 
 import view  # import just the module name to avoid circular import
 
@@ -19,9 +20,12 @@ class SoundMania:
         self.display_surface = self._get_display()
         self.clock = pygame.time.Clock()
         
+        self.config = ConfigIO()
+        md = self.config.get_user_map_directory()
+        
         self.request_queue = RequestQueue()
         self.view_manager = ViewManager()
-        self.map_manager = MapManager()
+        self.map_manager = MapManager(md)
         
         
     def run(self) -> None:
@@ -33,16 +37,20 @@ class SoundMania:
     
     
     def request_view_change(self, view: type[view.View]) -> None:
-        """ Make a request of changing the current view. """
+        """ Make a queued request of changing the current view. """
         if type(self.view_manager.get_current_view()) != view:
             request = partial(self.view_manager.set_view, view=view, root=self)
             self.request_queue.add(request)
     
     
     def request_transition_out(self, duration: int) -> None:
-        """ Make a request of playing the out transition for `duration` miliseconds. """
+        """ Make a queued request of playing the out transition for `duration` miliseconds. """
         request = partial(self.view_manager.transition_out, duration)
         self.request_queue.add(request, timeout=duration)
+        
+        
+    def request_map_play(self, map_path: str) -> None:
+        pass
         
         
     def request_song_play(self, song_path: str) -> None:
@@ -51,7 +59,7 @@ class SoundMania:
         
         
     def request_quit(self) -> None:
-        """ Make a request of shutting down the application. """
+        """ Make a queued request of shutting down the application. """
         def request():
             self.running = False
             

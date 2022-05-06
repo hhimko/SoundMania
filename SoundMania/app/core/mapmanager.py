@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-import configparser
 import os
 
 import logging
@@ -18,14 +17,8 @@ class MapManager:
     MAP_EXTENSION = ".smm"
     INFO_FILE_NAME = "info"
     
-    CONF_PATH = "SoundMania\\locals\\conf.ini"
-    CONF_DEFAULTS = {
-        "map_dir": "SoundMania\\locals\\maps",
-    }
-    
-    
-    def __init__(self): 
-        self.local_path = self._get_user_path()
+    def __init__(self, map_dir_path: str): 
+        self.local_path = map_dir_path
         self._map_info_cache: dict[str, MapInfo] = {}
         
         
@@ -97,17 +90,4 @@ class MapManager:
             return MapInfo(path, author, name, song_path)
         
         return None
-    
-    
-    @classmethod
-    def _get_user_path(cls) -> str:
-        config = configparser.ConfigParser() # TODO: probably extract config parsing to a distinct file manager
-        config.read(cls.CONF_PATH)
-        
-        try:
-            return config["COMMON"]["map_dir"]
-        except KeyError:
-            default = cls.CONF_DEFAULTS["map_dir"]
-            logger.info(f"Could not obtain map directory from 'conf.ini'. Defaulting to '{default}'")
-            return default
         
