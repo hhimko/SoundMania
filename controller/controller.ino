@@ -21,6 +21,7 @@ void setup() {
 
 }
 
+
 void loop() {
   
   if (readButtonState(buttonState))
@@ -28,7 +29,15 @@ void loop() {
 
 }
 
+
 bool readButtonState(byte& state){
+  /*
+      Read the current controller's buttons states into a byte reference.
+      Individual bits in the byte represent the consecutive button states, where a binary 1 stands for the button being pressed. 
+
+      If the read sequence differs from the passed reference, the function returns a boolean true, false otherwise.
+      This enables the program to send the button packets only if a change of state has occured. 
+  */
   byte previous_state = state;
 
   for (int i=BUTTON_COUNT-1; i >= 0; --i){
@@ -44,17 +53,30 @@ bool readButtonState(byte& state){
   return state ^ previous_state; // this will return 0 only when the states are equal
 }
 
+
 void sendButtonPacket(byte state){
-  Serial.write(0b00000000 + state);
+  /*
+      Send the passed buttons state as a packet to the serial port. 
+
+      The button packet should always contain a binary 0 as the MSB,
+      so a maximum of 7 button states can be registered.
+  */
+  Serial.write(0b00000000 + state & 0b01111111);
 }
 
+
 void sendKnobPacket(byte state){
-  Serial.write(0b10000000 + state);
+  /*
+      Send the passed knobs state as a packet to the serial port. 
+
+      The knob packet should always contain a binary 1 as the MSB.
+  */
+  Serial.write(0b10000000 + state & 0b01111111);
 }
 
 
 // serialEvent() is automatically run at the end of loop()
-void serialEvent() {
+void serialEvent() { // TODO: recieve button colors and lcd commands (?)
   while (Serial.available() > 0) {
     char recv = Serial.read();
     
