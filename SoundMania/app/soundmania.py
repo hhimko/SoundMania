@@ -3,6 +3,7 @@ from typing import Literal
 
 import pygame
 
+from core.arduino_controller import ArduinoController
 from core.requestqueue import RequestQueue
 from core.viewmanager import ViewManager
 from core.mapmanager import MapManager
@@ -20,6 +21,8 @@ class SoundMania:
         pygame.init()
         self.display_surface = self._get_display()
         self.clock = pygame.time.Clock()
+        
+        self.controller = ArduinoController()
         
         self.config = ConfigIO()
         md = self.config.get_user_map_directory()
@@ -42,6 +45,14 @@ class SoundMania:
         if type(self.view_manager.get_current_view()) != view:
             request = partial(self.view_manager.set_view, view=view, root=self)
             self.request_queue.add(request)
+            
+            
+    def request_set_background_visibility(self, state: bool) -> None:
+        """ Make a queued request of setting the visibility of an animated view background. """
+        def request():
+            self.view_manager._background["visible"] = state
+            
+        self.request_queue.add(request)
     
     
     def request_transition_play(self, transition_name: Literal["out", "in"], duration: int) -> None:
@@ -80,6 +91,7 @@ class SoundMania:
     def _mainloop(self) -> None:
         while self.running:
             dt = self.clock.tick()
+            self.controller.update(dt)
             event_list = pygame.event.get()
             
             self.view_manager.handle_events(event_list)
@@ -88,7 +100,6 @@ class SoundMania:
             self.request_queue.process(dt)
             
             self.view_manager.render(self.display_surface)
-            
             
             pygame.display.flip()
             pygame.display.set_caption(f"SoundMania | FPS: {round(self.clock.get_fps())}")

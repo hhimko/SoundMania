@@ -20,8 +20,10 @@ class MapIndex(UIContainer):
         self.root = root
         self._selected_index = 0
         
-        self._visible_count = self._calculate_visible_count() 
         self._map_paths = self.root.map_manager.load_available_maps()
+        
+        self._visible_count = self._calculate_visible_count() 
+        self._spawn_visible()
         
         
     def get_prefab(self) -> UIContainer:

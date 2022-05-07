@@ -37,6 +37,10 @@ class MapIndexView(View):
                     
                 elif event.key == pygame.K_z:
                      print(abs((pygame.mixer.music.get_pos() / (1000 / (140/60))) % 1 - 0.5) * 100)
+                     
+                     
+    def prepare(self) -> None:
+        self.root.request_set_background_visibility(False)
                 
             
     def update(self, dt: int) -> None:

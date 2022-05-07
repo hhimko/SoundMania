@@ -53,6 +53,10 @@ class MainMenuView(view.View):
                     
                 elif event.key == pygame.K_q:
                     self._button_quit_callback()
+                    
+                    
+    def prepare(self) -> None:
+        self.root.request_set_background_visibility(True)
                 
             
     def update(self, dt: int) -> None:
@@ -60,7 +64,6 @@ class MainMenuView(view.View):
     
     
     def render(self, surface: pygame.surface.Surface) -> None:
-        surface.fill((255, 0, 0))
         self.menu_items.render(surface)
         
         

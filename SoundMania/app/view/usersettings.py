@@ -12,7 +12,7 @@ class UserSettingsView(view.View):
         super().__init__(root)
 
         # view layout
-        self.button_return = Button("button_return", (0, vh(40), vw(60), vh(10)), text="RETURN", text_color=(255,255,255), centered=True)
+        self.button_return = Button("button_return", (0, vh(45), vw(60), vh(10)), text="RETURN", text_color=(255,255,255), centered=True)
         self.button_return.on_mouse_click = self._button_return_callback
 
 
@@ -24,6 +24,10 @@ class UserSettingsView(view.View):
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     self._button_return_callback()
+                    
+                    
+    def prepare(self) -> None:
+        self.root.request_set_background_visibility(False)
                 
             
     def update(self, dt: int) -> None:
