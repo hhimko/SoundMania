@@ -27,7 +27,7 @@ class UserSettingsView(view.View):
                     
                     
     def prepare(self) -> None:
-        self.root.request_set_background_visibility(False)
+        self.root.set_background_visibility(True)
                 
             
     def update(self, dt: int) -> None:
@@ -35,7 +35,6 @@ class UserSettingsView(view.View):
     
     
     def render(self, surface: pygame.surface.Surface) -> None:
-        surface.fill((255, 0, 0))
         self.button_return.render(surface)
         
         

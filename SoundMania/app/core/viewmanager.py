@@ -1,11 +1,13 @@
 from __future__ import annotations
 from functools import cache
+from math import cos, sin, radians
 
 import logging
 logger = logging.getLogger("ViewManager")
 
 import pygame
 
+from ui.core.units import vw, vh
 import soundmania
 import view
 
@@ -18,8 +20,11 @@ class ViewManager:
         self._background = {
             "visible": False,
             "surface": self._get_display_surface_copy(),
-            "color_back": (236, 60, 12),
-            "color_front": (245, 172, 35)
+            "color_back": (167, 0, 29),
+            "color_front": (216, 19, 51),
+            "should_update": True,
+            "animation_duration": 1000,
+            "animation_time_elapsed": 0
         }
         
         self._transition = {
@@ -114,7 +119,9 @@ class ViewManager:
                 dt: elapsed time since the last frame
         """
         if self._background["visible"]:
-            self._background_update(dt)
+            if self._background["should_update"]:
+                self._background_update(dt)
+            self._background["should_update"] = not self._background["should_update"] # background is being updated every 2 frames
         
         current_view = self.get_current_view()
         current_view.update(dt)
@@ -141,7 +148,34 @@ class ViewManager:
             
             
     def _background_update(self, dt: int) -> None:
-        pass
+        bgs = self._background["surface"]
+        bgs.fill(self._background["color_back"])
+        
+        display_w, display_h = pygame.display.get_window_size()
+        anchor_x, anchor_y = (-display_w*0.03, display_h*1.2)
+        circle_radius = display_h//1.4
+        
+        pygame.draw.circle(bgs, self._background["color_front"], (anchor_x, anchor_y), circle_radius, draw_top_right=True)
+        
+        self._background["animation_time_elapsed"] += dt / self._background["animation_duration"]
+        self._background["animation_time_elapsed"] %= 1
+        
+        line_count = 6
+        line_length = max(display_w, display_h) 
+        angle_offset = 8
+        for i in range(line_count):
+            angle = radians(-95/line_count*(i + self._background["animation_time_elapsed"]) - angle_offset/2)
+            slope_l = cos(angle), sin(angle)
+            angle += radians(angle_offset)
+            slope_r = cos(angle), sin(angle)
+            
+            start_l = (anchor_x + slope_l[0]*(circle_radius-20), anchor_y + slope_l[1]*(circle_radius-20))
+            end_l = (anchor_x + slope_l[0]*(line_length + circle_radius), anchor_y + slope_l[1]*(line_length + circle_radius))
+            
+            start_r = (anchor_x + slope_r[0]*(circle_radius-20), anchor_y + slope_r[1]*(circle_radius-20))
+            end_r = (anchor_x + slope_r[0]*(line_length + circle_radius), anchor_y + slope_r[1]*(line_length + circle_radius))
+            
+            pygame.draw.polygon(bgs, self._background["color_front"], (start_l, end_l, end_r, start_r))  
     
     
     def _transition_update(self, dt: int) -> None:

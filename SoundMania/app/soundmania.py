@@ -47,12 +47,9 @@ class SoundMania:
             self.request_queue.add(request)
             
             
-    def request_set_background_visibility(self, state: bool) -> None:
+    def set_background_visibility(self, state: bool) -> None:
         """ Make a queued request of setting the visibility of an animated view background. """
-        def request():
-            self.view_manager._background["visible"] = state
-            
-        self.request_queue.add(request)
+        self.view_manager._background["visible"] = state
     
     
     def request_transition_play(self, transition_name: Literal["out", "in"], duration: int) -> None:
@@ -61,6 +58,7 @@ class SoundMania:
             "out": self.view_manager.transition_out,
             "in":  self.view_manager.transition_in,
         }
+        
         request = partial(transmap[transition_name], duration)
         self.request_queue.add(request, timeout=duration)
         
@@ -91,7 +89,7 @@ class SoundMania:
     def _mainloop(self) -> None:
         while self.running:
             dt = self.clock.tick()
-            self.controller.update(dt)
+            # self.controller.update(dt)
             event_list = pygame.event.get()
             
             self.view_manager.handle_events(event_list)

@@ -40,7 +40,7 @@ class MapIndexView(View):
                      
                      
     def prepare(self) -> None:
-        self.root.request_set_background_visibility(False)
+        self.root.set_background_visibility(False)
                 
             
     def update(self, dt: int) -> None:

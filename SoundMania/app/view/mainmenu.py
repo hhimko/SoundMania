@@ -3,7 +3,7 @@ from __future__ import annotations
 import pygame
 
 from ui import Button, MenuItemList
-from ui.core.units import pw, vh
+from ui.core.units import pw, vw, vh
 import view
 
 
@@ -12,7 +12,7 @@ class MainMenuView(view.View):
         super().__init__(root)
 
         # view layout
-        self.menu_items = MenuItemList("menu_container", (0, 0, vh(70), vh(50)),
+        self.menu_items = MenuItemList("menu_container", (vw(15), 0, vh(70), vh(50)),
             Button("button_play", (0, vh(-15), pw(80), vh(10)), 
                 centered=True, text="PLAY", color=(255,255,255)
             ),
@@ -56,7 +56,7 @@ class MainMenuView(view.View):
                     
                     
     def prepare(self) -> None:
-        self.root.request_set_background_visibility(True)
+        self.root.set_background_visibility(True)
                 
             
     def update(self, dt: int) -> None:
