@@ -52,13 +52,25 @@ class ViewManager:
                 self._overlay_alpha = 255
                 self.transition_stop()
         
-        
         self._transition_update_callback = out_callback
+        
+    
+    def transition_in(self, duration: int):
+        """ Start a new screen-in transition. """
+        def in_callback(dt: int):
+            if self._transition_time < duration:
+                self._overlay_alpha = round(255 * (1 - (self._transition_time / duration)))
+                self._transition_time += dt
+            else:
+                self._overlay_alpha = 0
+                self.transition_stop()
+        
+        self._transition_update_callback = in_callback
     
     
     def transition_stop(self):
         """ Stop the currently played transition. """
-        self._transition_callback = self.NO_OP
+        self._transition_update_callback = self.NO_OP
         self._transition_time = 0
             
             

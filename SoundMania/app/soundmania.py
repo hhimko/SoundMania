@@ -1,4 +1,5 @@
 from functools import partial
+from typing import Literal
 
 import pygame
 
@@ -43,10 +44,20 @@ class SoundMania:
             self.request_queue.add(request)
     
     
-    def request_transition_out(self, duration: int) -> None:
-        """ Make a queued request of playing the out transition for `duration` miliseconds. """
-        request = partial(self.view_manager.transition_out, duration)
+    def request_transition_play(self, transition_name: Literal["out", "in"], duration: int) -> None:
+        """ Make a queued request of playing a view transition for `duration` miliseconds. """
+        transmap = {
+            "out": self.view_manager.transition_out,
+            "in":  self.view_manager.transition_in,
+        }
+        request = partial(transmap[transition_name], duration)
         self.request_queue.add(request, timeout=duration)
+        
+        
+    def request_transition_stop(self) -> None:
+        """ Make a queued request of stopping the currently played view transition. """
+        request = self.view_manager.transition_stop
+        self.request_queue.add(request)
         
         
     def request_map_play(self, map_path: str) -> None:

@@ -13,16 +13,20 @@ class MainMenuView(view.View):
 
         # view layout
         self.menu_items = MenuItemList("menu_container", (0, 0, vh(70), vh(50)),
-            Button("button_play", (0, vh(-10), pw(80), vh(10)), 
+            Button("button_play", (0, vh(-15), pw(80), vh(10)), 
                 centered=True, text="PLAY", color=(255,255,255)
             ),
-            Button("button_quit", (0, vh( 10), pw(80), vh(10)),
+            Button("button_settings", (0, 0, pw(80), vh(10)),
+                centered=True, text="SETTINGS", color=(255,255,255)
+            ),
+            Button("button_quit", (0, vh(15), pw(80), vh(10)),
                 centered=True, text="QUIT", color=(255,255,255)
             ),
             centered = True
         )
 
         self.menu_items.button_play.on_mouse_click = self._button_play_callback
+        self.menu_items.button_settings.on_mouse_click = self._button_settings_callback
         self.menu_items.button_quit.on_mouse_click = self._button_quit_callback
         
 
@@ -44,6 +48,9 @@ class MainMenuView(view.View):
                 elif event.key == pygame.K_p:
                     self._button_play_callback()
                     
+                elif event.key == pygame.K_s:
+                    self._button_settings_callback()
+                    
                 elif event.key == pygame.K_q:
                     self._button_quit_callback()
                 
@@ -64,8 +71,14 @@ class MainMenuView(view.View):
     def _button_play_callback(self, *args) -> None:
         self.root.request_view_change(view.MapIndexView)
         
+    
+    def _button_settings_callback(self, *args) -> None:
+        self.root.request_transition_play("out", 200)
+        self.root.request_view_change(view.UserSettingsView)
+        self.root.request_transition_play("in", 200)
+        
         
     def _button_quit_callback(self, *args) -> None:
-        self.root.request_transition_out(750)
+        self.root.request_transition_play("out", 750)
         self.root.request_quit()
     

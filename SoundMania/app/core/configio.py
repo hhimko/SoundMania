@@ -1,3 +1,4 @@
+from functools import cached_property
 import configparser
 
 import logging
@@ -11,16 +12,12 @@ class ConfigIO:
         "map_dir": "SoundMania\\locals\\maps"
     }
     
-    def __init__(self):
-        pass
-    
-    
-    def settings_get(self) -> tuple[str, ...]:
+    def settings_get(self, name: str) -> str:
         """ Helper method for extracting user's local settings. """
-        return ()
+        return self[name]
     
     
-    def settings_set(self, **kwargs: dict[str, str]) -> None:
+    def settings_set(self, **mapping: dict[str, str]) -> None:
         """ Helper method for overriding user's local settings. """
         pass
     
@@ -44,11 +41,11 @@ class ConfigIO:
             default = cls.DEFAULTS["map_dir"]
             logger.info(f"Could not obtain map directory from 'conf.ini'. Defaulting to '{default}'")
             return default
+        
     
-    
-    def __get_item__(self, name: str) -> str:
+    def __getitem__(self, name: str) -> str:
         return ''
     
     
-    def __set_item__(self, name: str, value: str) -> None:
+    def __setitem__(self, name: str, value: str) -> None:
         return
