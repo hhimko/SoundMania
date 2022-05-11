@@ -51,7 +51,7 @@ class ViewManager:
         return view(root)
     
     
-    def set_view(self, view: type[view.View], root: soundmania.SoundMania) -> None:
+    def set_view(self, view: view.View, root: soundmania.SoundMania) -> None:
         """ Setter of the current view. """
         new_view = self.get_view(view, root)
         new_view.on_window_resize() # recalculate the view components sizes 
