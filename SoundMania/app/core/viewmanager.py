@@ -1,13 +1,12 @@
 from __future__ import annotations
-from functools import cache
 from math import cos, sin, radians
+from functools import cache
 
 import logging
 logger = logging.getLogger("ViewManager")
 
 import pygame
 
-from ui.core.units import vw, vh
 import soundmania
 import view
 
@@ -51,9 +50,9 @@ class ViewManager:
         return view(root)
     
     
-    def set_view(self, view: view.View, root: soundmania.SoundMania) -> None:
+    def set_view(self, view: type[view.View], root: soundmania.SoundMania) -> None:
         """ Setter of the current view. """
-        new_view = self.get_view(view, root)
+        new_view = self.get_view(view, root) # type: ignore
         new_view.on_window_resize() # recalculate the view components sizes 
         new_view.prepare()
         

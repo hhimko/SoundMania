@@ -3,7 +3,7 @@ from typing import Literal
 
 import pygame
 
-from core.arduino_controller import ArduinoController
+from core.input.inputmanager import InputManager
 from core.requestqueue import RequestQueue
 from core.viewmanager import ViewManager
 from core.mapmanager import MapManager
@@ -22,12 +22,11 @@ class SoundMania:
         self.display_surface = self._get_display()
         self.clock = pygame.time.Clock()
         
-        self.controller = ArduinoController()
-        
         self.config = ConfigIO()
         md = self.config.get_user_map_directory()
         
         self.request_queue = RequestQueue()
+        self.input_manager = InputManager()
         self.view_manager = ViewManager()
         self.map_manager = MapManager(md)
         
@@ -89,13 +88,11 @@ class SoundMania:
     def _mainloop(self) -> None:
         while self.running:
             dt = self.clock.tick()
-            # self.controller.update(dt)
-            event_list = pygame.event.get()
             
-            self.view_manager.handle_events(event_list)
+            self._handle_events()
+            self.request_queue.process(dt)
             
             self.view_manager.update(dt)
-            self.request_queue.process(dt)
             
             self.view_manager.render(self.display_surface)
             
@@ -103,6 +100,13 @@ class SoundMania:
             pygame.display.set_caption(f"SoundMania | FPS: {round(self.clock.get_fps())}")
             
         self._shutdown()
+        
+        
+    def _handle_events(self):
+        event_list = []
+        event_list.extend(self.input_manager.poll_events())
+        
+        self.view_manager.handle_events(event_list)
         
         
     def _get_display(self) -> pygame.surface.Surface:        

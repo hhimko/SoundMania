@@ -8,5 +8,5 @@ _TupleI4 = tuple[int,int,int,int]
 _ColorRGBA = _TupleI3
 _ColorRGB = _TupleI4
 
-_Unit = float | Type[EvalAttrProxy]
+_Unit = float | EvalAttrProxy
 _UnitRect = tuple[_Unit, _Unit, _Unit, _Unit]
