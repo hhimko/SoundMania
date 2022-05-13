@@ -4,16 +4,16 @@ import logging
 logger = logging.getLogger("RequestQueue")
 
 
-class _Request:
+class _RequestItem:
     def __init__(self, callback: Callable, timeout: int):
         self.callback = callback
         self.timeout = timeout
 
 
 class RequestQueue:
-    def __init__(self, maxsize: int = 5):
+    def __init__(self, maxsize: int = 10):
         self.maxsize = maxsize
-        self._req_queue: list[_Request] = []
+        self._req_queue: list[_RequestItem] = []
         self._timeout = 0
 
 
@@ -23,7 +23,7 @@ class RequestQueue:
             logger.critical("Queue is full. An incoming request has been ignored")
             return
         
-        self._req_queue.append(_Request(request, timeout))
+        self._req_queue.append(_RequestItem(request, timeout))
         
         
     def process(self, dt: int) -> None:

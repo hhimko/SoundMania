@@ -6,7 +6,7 @@ from typing import Any, Callable
 class callback_property(property):
     """ Descriptor class for callable properties. 
 
-        callbackproperty makes sure a property is always callable, giving it 
+        callback_property makes sure a property is always callable, giving it 
         a NO_OP method callback by default. 
 
         A callbackproperty instance can be set to either a callable method or
@@ -52,7 +52,12 @@ class callback_property(property):
         
         
         
-def notify_property_changed(notifier_callback: Callable[[Any], Any] | callback_property) -> type[property]:
+def notify_property_changed(notifier_callback: Callable[[Any, Any], Any] | callback_property) -> type[property]:
+    """ Factory decorator for state-change notifier properties. 
+
+        notify_property_changed internally creates and returns a new NotifyPropertyChanged object thats 
+        wrapped around a specified notifier_callback, called everytime the underling property state changes.
+    """
     
     class NotifyPropertyChanged(property):
         def __init__(self, 
@@ -71,9 +76,9 @@ def notify_property_changed(notifier_callback: Callable[[Any], Any] | callback_p
                 if not self.fget or value != self.fget(obj):
                     if isinstance(notifier_callback, callback_property):
                         callback = notifier_callback.__get__(obj)
-                        callback()
+                        callback(value)
                     else:
-                        notifier_callback(obj)
+                        notifier_callback(obj, value)
                     
                 fset(obj, value)
                 
