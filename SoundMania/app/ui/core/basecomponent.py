@@ -4,7 +4,7 @@ from functools import cached_property
 import pygame
 
 from ui.core.type import _ColorRGB, _ColorRGBA, _Unit, _UnitRect
-from ui.core.core import EvalAttrProxy
+from core.core import EvalAttrProxy
 
 
 def _read_size_from_rect(rect: _UnitRect | pygame.Rect) -> _UnitRect:

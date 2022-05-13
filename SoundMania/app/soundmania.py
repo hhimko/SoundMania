@@ -89,9 +89,11 @@ class SoundMania:
         while self.running:
             dt = self.clock.tick()
             
-            self._handle_events()
-            self.request_queue.process(dt)
+            event_list = self.input_manager.poll_events()
+            self.view_manager.handle_events(event_list)
             
+            self.request_queue.process(dt)
+            self.input_manager.update(dt)
             self.view_manager.update(dt)
             
             self.view_manager.render(self.display_surface)
@@ -100,13 +102,6 @@ class SoundMania:
             pygame.display.set_caption(f"SoundMania | FPS: {round(self.clock.get_fps())}")
             
         self._shutdown()
-        
-        
-    def _handle_events(self):
-        event_list = []
-        event_list.extend(self.input_manager.poll_events())
-        
-        self.view_manager.handle_events(event_list)
         
         
     def _get_display(self) -> pygame.surface.Surface:        

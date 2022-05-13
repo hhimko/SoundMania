@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import pygame
 
+from core.input import INPUT_EVENT
 from ui import Button, MenuItemList
 from ui.core.units import pw, vw, vh
 import view
@@ -34,6 +35,9 @@ class MainMenuView(view.View):
         for event in event_list:
             if event.type == pygame.QUIT:
                 self.root.request_quit()
+                
+            elif event.type == INPUT_EVENT:
+                pass
 
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_UP:

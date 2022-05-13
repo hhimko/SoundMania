@@ -3,7 +3,7 @@ from functools import partial
 from typing import Any, Callable
 
 
-class callbackproperty(property):
+class callback_property(property):
     """ Descriptor class for callable properties. 
 
         callbackproperty makes sure a property is always callable, giving it 
@@ -35,7 +35,7 @@ class callbackproperty(property):
         return getattr(obj, self.callback_accessor)
     
     
-    def setter(self, obj: Any, value: Callable | None) -> None: # type: ignore
+    def setter(self, obj: Any, value: Callable[[Any], Any] | None) -> None: # type: ignore
         if value is None:
             return self.deleter(obj)
         
@@ -51,6 +51,39 @@ class callbackproperty(property):
         
         
         
+        
+def notify_property_changed(notifier_callback: Callable[[Any], Any] | callback_property) -> type[property]:
+    
+    class NotifyPropertyChanged(property):
+        def __init__(self, 
+                     fget: Callable[[Any], Any] | None = None, 
+                     fset: Callable[[Any, Any], None] | None = None, 
+                     fdel: Callable[[Any], None] | None = None, 
+                     doc: str | None = None):
+            if fset:
+                fset = self._setter_wrapper(fset)
+                
+            super().__init__(fget, fset, fdel, doc)
+
+
+        def _setter_wrapper(self, fset):
+            def inner(obj: Any, value: Any):
+                if not self.fget or value != self.fget(obj):
+                    if isinstance(notifier_callback, callback_property):
+                        callback = notifier_callback.__get__(obj)
+                        callback()
+                    else:
+                        notifier_callback(obj)
+                    
+                fset(obj, value)
+                
+            return inner
+        
+        
+    return NotifyPropertyChanged
+        
+
+
 
 class EvalAttrProxy(ABC):
     def __init__(self, value: float):

@@ -1,15 +1,16 @@
 import pygame
 
+from core.core import callback_property
 from ui.core.type import _UnitRect
-from ui.core import UIComponent, callbackproperty
+from ui.core import UIComponent
 
 
 class Button(UIComponent):
-    on_mouse_pressed = callbackproperty()
-    on_mouse_click   = callbackproperty()
-    on_mouse_over    = callbackproperty()
-    on_mouse_down    = callbackproperty()
-    on_mouse_up      = callbackproperty()
+    on_mouse_pressed = callback_property()
+    on_mouse_click   = callback_property()
+    on_mouse_over    = callback_property()
+    on_mouse_down    = callback_property()
+    on_mouse_up      = callback_property()
 
     def __init__(self, name: str, rect: _UnitRect | pygame.Rect, **kwargs):
         super().__init__(name, rect, **kwargs)

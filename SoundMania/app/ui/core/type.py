@@ -1,6 +1,6 @@
 from typing import Type
 
-from ui.core.core import EvalAttrProxy
+from core.core import EvalAttrProxy
 
 _TupleI3 = tuple[int,int,int]
 _TupleI4 = tuple[int,int,int,int]

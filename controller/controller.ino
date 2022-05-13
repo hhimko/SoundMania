@@ -2,6 +2,10 @@
 #define BUTTON_COUNT 4
 byte BUTTON_PINS[BUTTON_COUNT] = {10, 11, 12, 13}; // BUTTON_PINS[0] should be defined as the leftmost button on the controller
 
+#define KNOB_COUNT 2
+byte KNOB_ENCODER_L_PINS[KNOB_COUNT] = {2, 4};
+byte KNOB_ENCODER_R_PINS[KNOB_COUNT] = {3, 5};
+
 /* CONTROLLER STATES */
 byte buttonState = 0b0000; // each bit corresponds to a single button state
 byte knobState   = 0b0;
@@ -12,6 +16,11 @@ void setup() {
   for (auto bp : BUTTON_PINS)
     pinMode(bp, INPUT_PULLUP);
 
+  for (int ki = 0; ki < KNOB_COUNT; ++ki){
+    pinMode(KNOB_ENCODER_L_PINS[ki], INPUT_PULLUP);
+    pinMode(KNOB_ENCODER_R_PINS[ki], INPUT_PULLUP);
+  }
+   
   // initialize serial communication at 9600 bits per second
   Serial.begin(115200);
 
@@ -62,6 +71,11 @@ void sendButtonPacket(byte state){
       so a maximum of 7 button states can be registered.
   */
   Serial.write(0b00000000 + state & 0b01111111);
+}
+
+
+bool readKnobState(){
+  return false;
 }
 
 

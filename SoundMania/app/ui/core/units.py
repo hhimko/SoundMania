@@ -2,7 +2,7 @@ from math import ceil
 
 import pygame
 
-from ui.core.core import EvalAttrProxy
+from core.core import EvalAttrProxy
 from ui.core.basecomponent import UIComponent
 
 
