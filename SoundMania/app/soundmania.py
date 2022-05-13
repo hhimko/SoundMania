@@ -52,19 +52,27 @@ class SoundMania:
     
     
     def request_transition_play(self, transition_name: Literal["out", "in"], duration: int) -> None:
-        """ Make a queued request of playing a view transition for `duration` miliseconds. """
+        """ Make a queued request of playing a view transition for `duration` miliseconds.
+        
+            request_transition_play implicitly freezes inpit handling for the duration of 
+            the transition being played.
+        """
         transmap = {
             "out": self.view_manager.transition_out,
             "in":  self.view_manager.transition_in,
         }
         
         request = partial(transmap[transition_name], duration)
+        
+        self.request_input_freeze(True)
         self.request_queue.add(request, timeout=duration)
+        self.request_input_freeze(False)
         
         
-    def request_transition_stop(self) -> None:
-        """ Make a queued request of stopping the currently played view transition. """
-        request = self.view_manager.transition_stop
+    def request_input_freeze(self, frozen: bool) -> None:
+        def request() -> None:
+            self.input_manager.frozen = frozen
+            
         self.request_queue.add(request)
         
         

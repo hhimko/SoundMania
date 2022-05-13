@@ -10,6 +10,7 @@ class InputManager:
     """ Manager class responsible for generating events. """
     def __init__(self):
         self.controller = self._controller_init()
+        self.frozen = False
         
         self._controller_conversions = {
             "OL": pygame.K_RETURN,
@@ -21,8 +22,13 @@ class InputManager:
         
     def poll_events(self) -> list[pygame.event.Event]:
         event_list = pygame.event.get()
+        if self.frozen:
+            # event_list = list(filter(lambda event: True, event_list))
+            event_list = []
+            
         for event in event_list:
-            pass
+            pass # TODO: generate custom mouse wheel events
+        
         return event_list
     
     

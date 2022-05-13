@@ -19,6 +19,9 @@ class RequestQueue:
 
     def add(self, request: Callable, timeout: int = 0) -> None:
         """ Create and add a new request to the queue from a callable. """
+        if timeout < 0:
+            raise ValueError("Request timeout duration cannot be negative.")
+        
         if len(self._req_queue) >= self.maxsize:
             logger.critical("Queue is full. An incoming request has been ignored")
             return
