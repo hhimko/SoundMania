@@ -63,17 +63,7 @@ class SoundMania:
         }
         
         request = partial(transmap[transition_name], duration)
-        
-        self.request_input_freeze(True)
-        self.request_queue.add(request, timeout=duration)
-        self.request_input_freeze(False)
-        
-        
-    def request_input_freeze(self, frozen: bool) -> None:
-        def request() -> None:
-            self.input_manager.frozen = frozen
-            
-        self.request_queue.add(request)
+        self.request_queue.add_blocking(request, timeout=duration)
         
         
     def request_map_play(self, map_path: str) -> None:
