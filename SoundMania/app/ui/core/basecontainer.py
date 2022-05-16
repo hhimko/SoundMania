@@ -2,13 +2,13 @@ from typing import Iterator, Generic, TypeVar
 
 import pygame
 
-from ui.core.type import _UnitRect
+from ui.core.type import _SizeRect
 from ui.core.basecomponent import UIComponent
 
 
 T = TypeVar('T', bound=UIComponent)
 class UIContainer(UIComponent, Generic[T]):
-    def __init__(self, name: str, rect: _UnitRect | pygame.Rect, *elements: T, **kwargs):
+    def __init__(self, name: str, rect: _SizeRect | pygame.Rect, *elements: T, **kwargs):
         self.elements: dict[str, T] = {}
         super().__init__(name, rect, **kwargs)
         

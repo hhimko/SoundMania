@@ -5,7 +5,7 @@ from math import ceil
 import pygame
 
 from ui.core import UIComponent, UIContainer
-from ui.core.type import _UnitRect
+from ui.core.type import _SizeRect
 from ui.core.units import pw, ph
 from ui.button import Button
 import soundmania
@@ -15,7 +15,7 @@ class MapIndex(UIContainer):
     BUTTON_OFFEST = 50
     BUTTON_HEIGHT = 150
     
-    def __init__(self, root: soundmania.SoundMania, name: str, rect: _UnitRect | pygame.Rect, **kwargs):
+    def __init__(self, root: soundmania.SoundMania, name: str, rect: _SizeRect | pygame.Rect, **kwargs):
         super().__init__(name, rect, **kwargs)
         self.root = root
         self._selected_index = 0

@@ -1,13 +1,13 @@
 import pygame
 
-from ui.core.type import _UnitRect
+from ui.core.type import _SizeRect
 from ui.core import UIContainer
 from ui.button import Button
 
 
 class MenuItemList(UIContainer[Button]):
     """ Indexable container class for Button components. """
-    def __init__(self, name: str, rect: _UnitRect | pygame.Rect, *buttons: Button, **kwargs):
+    def __init__(self, name: str, rect: _SizeRect | pygame.Rect, *buttons: Button, **kwargs):
         super().__init__(name, rect, *buttons, **kwargs)
         self._selected_index = 0
 

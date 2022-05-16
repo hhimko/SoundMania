@@ -2,9 +2,7 @@ from __future__ import annotations
 
 import pygame
 
-from core.input import SMEvent
 from ui import Button, MenuItemList
-from ui.core.units import pw, vw, vh
 import view
 
 
@@ -13,14 +11,14 @@ class MainMenuView(view.View):
         super().__init__(root)
 
         # view layout
-        self.menu_items = MenuItemList("menu_container", (vw(15), 0, vh(70), vh(50)),
-            Button("button_play", (0, vh(-15), pw(80), vh(10)), 
+        self.menu_items = MenuItemList("menu_container", ("15vw", 0, "70vh", "50vh"),
+            Button("button_play", (0, "-15vh", "80pw", "10vh"), 
                 centered=True, text="PLAY", color=(255,255,255)
             ),
-            Button("button_settings", (0, 0, pw(80), vh(10)),
+            Button("button_settings", (0, 0, "80pw", "10vh"),
                 centered=True, text="SETTINGS", color=(255,255,255)
             ),
-            Button("button_quit", (0, vh(15), pw(80), vh(10)),
+            Button("button_quit", (0, "15vh", "80pw", "10vh"),
                 centered=True, text="QUIT", color=(255,255,255)
             ),
             centered = True
@@ -73,16 +71,19 @@ class MainMenuView(view.View):
         
         
     def _button_play_callback(self, *args) -> None:
+        self.root.request_sound_play("SoundMania\\src\\menu_select.ogg")
         self.root.request_view_change(view.MapIndexView)
         
     
     def _button_settings_callback(self, *args) -> None:
-        self.root.request_transition_play("out", 200)
+        self.root.request_sound_play("SoundMania\\src\\menu_select.ogg")
+        self.root.request_transition_play("out", 150)
         self.root.request_view_change(view.UserSettingsView)
-        self.root.request_transition_play("in", 200)
+        self.root.request_transition_play("in", 150)
         
         
     def _button_quit_callback(self, *args) -> None:
-        self.root.request_transition_play("out", 750)
+        self.root.request_sound_play("SoundMania\\src\\menu_select.ogg")
+        self.root.request_transition_play("out", 1250)
         self.root.request_quit()
     

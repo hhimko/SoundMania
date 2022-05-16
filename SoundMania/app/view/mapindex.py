@@ -1,7 +1,6 @@
 import pygame
 
 from ui import Button, MapIndex
-from ui.core.units import vw, vh
 from view.baseview import View
 import view
 
@@ -11,10 +10,10 @@ class MapIndexView(View):
         super().__init__(root)
 
         # view layout
-        self.button_return = Button("button_return", (0,vh(90),vw(100),vh(10)), text="RETURN", text_color=(255,255,255))
+        self.button_return = Button("button_return", (0, "90vh", "100vw", "10vh"), text="RETURN", text_color=(255,255,255))
         self.button_return.on_mouse_click = lambda obj: self.root.request_view_change(view.MainMenuView)
         
-        self.map_index = MapIndex(root, "map_index", (0, vh(-5), vw(60), vh(90)), centered=True)
+        self.map_index = MapIndex(root, "map_index", (0, "-5vh", "60vw", "90vh"), centered=True)
         
 
     def handle_input(self, event_list: list[pygame.event.Event]) -> None:

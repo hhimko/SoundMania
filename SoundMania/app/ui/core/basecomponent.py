@@ -1,39 +1,35 @@
 from __future__ import annotations
 from functools import cached_property
+from typing import Iterable
 
 import pygame
 
-from ui.core.type import _ColorRGB, _ColorRGBA, _Unit, _UnitRect
+from ui.core.type import _SizeRect, _SizeUnitOrStr, _TupleI3, _TupleI4
+from ui.core.units import ph, pw, vh, vw
 from core.core import EvalAttrProxy
-
-
-def _read_size_from_rect(rect: _UnitRect | pygame.Rect) -> _UnitRect:
-    if isinstance(rect, pygame.Rect):
-        return rect.x, rect.y, rect.w, rect.h
-    return rect
         
-    
 class UIComponent:
-    """ Abstract class defining a renderable UI element. """
-    def __init__(self, name: str, rect: _UnitRect | pygame.Rect, **kwargs):
+    """ Base class defining a renderable UI element. """
+    def __init__(self, name: str, size_rect: _SizeRect | pygame.Rect, **kwargs):
         self.name = name
         self._parent: UIComponent | None = None
         
         self._hidden = False
         self.is_dirty = True # forces the surface to be redrawn on first render
 
-        self._x, self._y, self._width, self._height = _read_size_from_rect(rect)
+        self._x, self._y, self._width, self._height = self._parse_size_rect(size_rect)
         self.surface = pygame.surface.Surface(self.size)
 
         # TODO: extract optional component modules 
         self._is_centered = False
-        self._color: _ColorRGB | _ColorRGBA = (0,0,0)
+        self._color: _TupleI4 = (0,0,0,0)
 
         self._text = ''
         self._text_size = self._height
-        self._text_color: _ColorRGB | _ColorRGBA = (0,0,0)
+        self._text_color: _TupleI4 = (0,0,0,0)
 
         self.config(**kwargs)
+        self.postinit()
         
         
     @property
@@ -56,7 +52,7 @@ class UIComponent:
     
     
     @position.setter
-    def position(self, value: tuple[_Unit, _Unit]) -> None:
+    def position(self, value: tuple[_SizeUnitOrStr, _SizeUnitOrStr]) -> None:
         self.x, self.y = value
         
         
@@ -70,7 +66,9 @@ class UIComponent:
     
     
     @x.setter
-    def x(self, value: _Unit) -> None:
+    def x(self, value: _SizeUnitOrStr) -> None:
+        if isinstance(value, str):
+            value = self._parse_unit_str(value)
         self._x = value
         self._winpos_recompute()
         
@@ -85,7 +83,9 @@ class UIComponent:
     
     
     @y.setter
-    def y(self, value: _Unit) -> None:
+    def y(self, value: _SizeUnitOrStr) -> None:
+        if isinstance(value, str):
+            value = self._parse_unit_str(value)
         self._y = value
         self._winpos_recompute()
         
@@ -100,7 +100,9 @@ class UIComponent:
 
 
     @width.setter
-    def width(self, value: _Unit) -> None:
+    def width(self, value: _SizeUnitOrStr) -> None:
+        if isinstance(value, str):
+            value = self._parse_unit_str(value)
         self._width = value
         
         self.is_dirty = True
@@ -118,7 +120,9 @@ class UIComponent:
 
 
     @height.setter
-    def height(self, value: _Unit) -> None:
+    def height(self, value: _SizeUnitOrStr) -> None:
+        if isinstance(value, str):
+            value = self._parse_unit_str(value)
         self._height = value
         
         self.is_dirty = True
@@ -132,7 +136,7 @@ class UIComponent:
     
     
     @size.setter
-    def size(self, value: tuple[_Unit, _Unit]) -> None:
+    def size(self, value: tuple[_SizeUnitOrStr, _SizeUnitOrStr]) -> None:
         self.width, self.height = value
         
         
@@ -158,13 +162,13 @@ class UIComponent:
         
 
     @property
-    def color(self) -> _ColorRGB | _ColorRGBA:
-        return self._color
+    def color(self) -> _TupleI3 | _TupleI4:
+        return self._color[:3] if self._color[3] == 255 else self._color
 
     
     @color.setter
-    def color(self, value: _ColorRGB | _ColorRGBA) -> None:
-        self._color = value
+    def color(self, value: _TupleI3 | _TupleI4) -> None:
+        self._color = value if len(value) == 4 else value + (255, )
         self.is_dirty = True
 
 
@@ -196,22 +200,17 @@ class UIComponent:
 
 
     @property
-    def text_color(self) -> _ColorRGB | _ColorRGBA:
-        return self._text_color
+    def text_color(self) -> _TupleI3 | _TupleI4:
+        return self._text_color if self._text_color[3] == 255 else self._text_color
 
     
     @text_color.setter
-    def text_color(self, value: _ColorRGB | _ColorRGBA) -> None:
-        self._text_color = value
+    def text_color(self, value: _TupleI3 | _TupleI4) -> None:
+        self._text_color = value if len(value) == 4 else value + (255, )
         if self.text:
             self.is_dirty = True
             
             
-    def get_rect(self) -> pygame.Rect:
-        """ Return a new pygame `Rect` object of this components' size with position absolute to the screen. """
-        return pygame.Rect(self._winpos, self.size)
-
-
     def config(self, **kwargs) -> None:
         """ Set all overwritable attributes passed as keyword arguments. """
         for k, v in kwargs.items():
@@ -221,7 +220,21 @@ class UIComponent:
                 raise AttributeError(f"can't overwrite attribute '{k}' of object '{type(self).__name__}'")
                 
             setattr(self, k, v)
-
+            
+            
+    def postinit(self) -> None:
+        """ Special method called once right after the object initialization.
+        
+            By defalt this method does nothing and is supposed to be overwritten in child classes.
+            `postinit()` was made to simplify child classes which do not need to override __init__. 
+        """
+        pass
+            
+            
+    def get_rect(self) -> pygame.Rect:
+        """ Return a new pygame `Rect` object of this components' size with position absolute to the screen. """
+        return pygame.Rect(self._winpos, self.size)
+    
 
     def update(self, dt: int) -> None:
         """ Update the current element state. 
@@ -243,7 +256,7 @@ class UIComponent:
                 self._redraw_surface()
                 
             surface.blit(self.surface, self._winpos)
-        
+            
         
     @cached_property
     def _winpos(self) -> tuple[float, float]:
@@ -284,3 +297,42 @@ class UIComponent:
         
         self._winpos_recompute()
         
+        
+    @staticmethod
+    def _parse_size_rect(rect: _SizeRect | pygame.Rect) -> Iterable[float | EvalAttrProxy]:
+        if isinstance(rect, pygame.Rect):
+            return rect.x, rect.y, rect.w, rect.h
+        
+        size: list[float | EvalAttrProxy] = [0, 0, 0, 0]
+        for i, value in enumerate(rect):
+            if isinstance(value, (int, float, EvalAttrProxy)):
+                size[i] = value 
+            elif isinstance(value, str):
+                size[i] = UIComponent._parse_unit_str(value)
+            else:
+                raise ValueError(f"invalid unit type. expected type 'float | Unit | str', got '{type(value)}'")
+        return size
+    
+    
+    @staticmethod
+    def _parse_unit_str(value: str) -> float | EvalAttrProxy:
+        str_to_unit: dict[str, type[EvalAttrProxy]] = {
+            "vw": vw,
+            "vh": vh,
+            "pw": pw,
+            "ph": ph
+        }
+        
+        
+        value = value.strip()
+        if value[-2:] in str_to_unit:
+            unit_wrapper = str_to_unit[value[-2:]]
+            try:
+                return unit_wrapper(float(value[:-2]))
+            except ValueError:
+                raise ValueError(f"invalid unit '{value}'")
+        else:
+            try:
+                return float(value)
+            except ValueError:
+                raise ValueError(f"invalid unit '{value}'")

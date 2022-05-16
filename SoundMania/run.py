@@ -2,7 +2,7 @@ from sys import path
 path.append("SoundMania/app")
 
 import logging
-logging.basicConfig(level="DEBUG", 
+logging.basicConfig(level="INFO", 
                     format="[{levelname}][{asctime}] {name}: {message}", 
                     style='{', 
                     datefmt=f"%H:%M:%S")
