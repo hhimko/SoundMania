@@ -1,9 +1,8 @@
 from __future__ import annotations
 
 import pygame
+import pygment
 
-from ui import Button#, Slider
-from ui.core import UIContainer
 import view
 
 
@@ -12,13 +11,17 @@ class UserSettingsView(view.View):
         super().__init__(root)
 
         # view layout
-        self.menu_options = UIContainer("menu_container", (0, 0, "60vw", "100vh"),
-            # Slider("slider_music_vol", (0, 0, "100pw", 50), color=(0, 0, 125)),
-            centered=True                                
-        )
+        settings = pygment.component.Frame("settings_frame", ("20sw", 0, "60sw", "100sh"))
+        settings.style.color = (0,0,0,128)
         
-        self.button_return = Button("button_return", (0, "45vh", "60vw", "10vh"), text="RETURN", text_color=(255,255,255), centered=True)
-        self.button_return.on_mouse_click = self._button_return_callback
+        button_return = pygment.component.Button("button_return", ("10pw", "90ph", "80pw", "10ph"))
+        button_return.style = {"color": (8,8,8), "border_radius": 20, "border_thickness": 5, "border_color": (0,0,0)}
+        button_return.add(pygment.component.Label("button_return_label", ("50pw", "50ph", "80pw", "80ph"), text="return", centered=True))
+        button_return.on_mouse_click = self._button_return_callback
+        button_return.join(settings)
+        
+        layout = (settings, )
+        self.viewrenderer = pygment.ViewRenderer((0,0), layout)
 
 
     def handle_input(self, event_list: list[pygame.event.Event]) -> None:
@@ -33,20 +36,19 @@ class UserSettingsView(view.View):
                     
     def prepare(self) -> None:
         self.root.set_background_visibility(True)
+        self.viewrenderer.size = self.root.display_surface.get_size()
                 
             
     def update(self, dt: int) -> None:
-        self.menu_options.update(dt)
-        self.button_return.update(dt)
+        self.viewrenderer.update(dt)
     
     
     def render(self, surface: pygame.surface.Surface) -> None:
-        self.menu_options.render(surface)
-        self.button_return.render(surface)
+        self.viewrenderer.render(surface, (0,0))
         
         
     def on_window_resize(self) -> None:
-        self.button_return._on_window_resize()
+        self.viewrenderer.size = self.root.display_surface.get_size()
         
         
     def _button_return_callback(self, *args) -> None:
