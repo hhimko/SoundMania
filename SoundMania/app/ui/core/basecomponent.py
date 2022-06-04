@@ -8,6 +8,7 @@ from ui.core.type import _SizeRect, _SizeUnitOrStr, _TupleI3, _TupleI4
 from ui.core.units import ph, pw, vh, vw
 from core.core import EvalAttrProxy
         
+        
 class UIComponent:
     """ Base class defining a renderable UI element. """
     def __init__(self, name: str, size_rect: _SizeRect | pygame.Rect, **kwargs):
@@ -336,3 +337,4 @@ class UIComponent:
                 return float(value)
             except ValueError:
                 raise ValueError(f"invalid unit '{value}'")
+            

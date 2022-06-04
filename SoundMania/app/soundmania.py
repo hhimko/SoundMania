@@ -75,6 +75,10 @@ class SoundMania:
         pygame.mixer.music.play()
         
         
+    def request_sound_play(self, sound_name: str) -> None:
+        pygame.mixer.Sound(sound_name).play()
+        
+        
     def request_quit(self) -> None:
         """ Make a queued request of shutting down the application. """
         def request():
