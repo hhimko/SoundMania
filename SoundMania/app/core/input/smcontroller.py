@@ -141,7 +141,6 @@ class SMController:
         
         if knob_idx:
             self.l_knob += change
-            print(self.l_knob)
         else:
             self.r_knob += change
 
