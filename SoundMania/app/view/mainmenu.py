@@ -3,6 +3,7 @@ from __future__ import annotations
 import pygame
 import pygment
 
+from core.input import SMEvent
 import view
 
 
@@ -73,6 +74,14 @@ class MainMenuView(view.View):
                 elif event.key == pygame.K_q:
                     self._button_quit_callback()
                     
+            elif event.type == SMEvent.CON_KNOB_CW:
+                self._selected_button_idx = (self._selected_button_idx + 1) % len(self._buttons)
+                self._change_selected_button(self._buttons[self._selected_button_idx])       
+                
+            elif event.type == SMEvent.CON_KNOB_CCW:
+                self._selected_button_idx = (self._selected_button_idx - 1) % len(self._buttons)
+                self._change_selected_button(self._buttons[self._selected_button_idx])    
+                        
                     
     def prepare(self) -> None:
         self.root.set_background_visibility(True)

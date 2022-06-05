@@ -122,7 +122,7 @@ class SMController:
         if packet & self.PACKET_TYPE_MASK == self.PACKET_TYPE_BUTTON:
             self._decode_button_packet(packet)
         else:
-            pass
+            self._decode_knob_packet(packet)
         
                     
     def _decode_button_packet(self, packet: int) -> None:
@@ -130,6 +130,21 @@ class SMController:
         self.il_button = bool(packet & self.PACKET_IL_BTN_MASK)
         self.ir_button = bool(packet & self.PACKET_IR_BTN_MASK)
         self.or_button = bool(packet & self.PACKET_OR_BTN_MASK)
+        
+        
+    def _decode_knob_packet(self, packet: int) -> None:
+        knob_idx = (packet >> 6) & 0b1
+        negative = (packet >> 5) & 0b1
+        change = (packet & 0b11111)
+        if negative:
+            change = -change
+        
+        if knob_idx:
+            self.l_knob += change
+            print(self.l_knob)
+        else:
+            self.r_knob += change
+
     
     def _try_connect(self, dt: int) -> None:
         if self._timeout > 0:
