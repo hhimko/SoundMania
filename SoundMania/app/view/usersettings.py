@@ -15,8 +15,10 @@ class UserSettingsView(view.View):
         settings.style.color = (0,0,0,128)
         
         button_return = pygment.component.Button("button_return", ("10pw", "90ph", "80pw", "10ph"))
-        button_return.style = {"color": (8,8,8), "border_radius": 20, "border_thickness": 5, "border_color": (0,0,0)}
-        button_return.add(pygment.component.Label("button_return_label", ("50pw", "50ph", "80pw", "80ph"), text="return", centered=True))
+        button_return.style = {"color": (8,8,8), "border_radius": 20, "border_color": (160,0,0)}
+        button_return.add(pygment.component.Label("button_return_label", ("50pw", "50ph", "80pw", "80ph"), text="return", align_center=True, centered=True))
+        button_return.on_mouse_enter = lambda btn: self._button_return_enter_callback(btn)
+        button_return.on_mouse_leave = lambda btn: setattr(btn.style, "border_thickness", 0)
         button_return.on_mouse_click = self._button_return_callback
         button_return.join(settings)
         
@@ -56,4 +58,9 @@ class UserSettingsView(view.View):
         self.root.request_transition_play("out", 150)
         self.root.request_view_change(view.MainMenuView)
         self.root.request_transition_play("in", 150)
+        
+        
+    def _button_return_enter_callback(self, btn: pygment.component.Button) -> None:
+        btn.style.border_thickness = 6
+        self.root.request_sound_play("SoundMania\\src\\menu_tick.ogg")
     
